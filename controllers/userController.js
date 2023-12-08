@@ -10,7 +10,6 @@ const SECRET_KEY = 'EDMERTION_SECRET'; // Replace this with a secure secret key
 
 const calculateAge = (dateOfBirth) => {
     const dob = new Date(dateOfBirth);
-    console.log(dob);
     const ageDiff = Date.now() - dob.getTime();
     const ageDate = new Date(ageDiff);
     return Math.abs(ageDate.getUTCFullYear() - 1970);

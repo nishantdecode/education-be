@@ -1,15 +1,19 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-// Manually set the connection parameters
-const sequelize = new Sequelize(
-  'postgres',          // Replace with your database name
-  'edmertion_admin',   // Replace with your database username
-  'edmertiondb',       // Replace with your database password
-  {
-    host: 'database-1.cw9wtxumnjt5.ap-south-1.rds.amazonaws.com', // Replace with your database host
-    port: 5432, // Replace with your database port
-    dialect: 'postgres',
-  }
-);
+const databaseUrl = "postgresql://postgres:9910@localhost:5432/edmertion";
+
+const match = databaseUrl.match(/^postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
+if (!match) {
+  throw new Error('DATABASE_URL is not correctly formatted');
+}
+
+const [, username, password, host, port, database] = match;
+
+const sequelize = new Sequelize(database, username, password, {
+  host,
+  port,
+  dialect: 'postgres',
+});
 
 module.exports = sequelize;
