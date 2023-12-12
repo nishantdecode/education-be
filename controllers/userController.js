@@ -170,12 +170,18 @@ const loginWithEmailAndOtp = async (req, res) => {
 };
 
 const updateUserDetails = async (req, res) => {
-    const { userId, firstName, lastName, dateOfBirth, country, state, city, profileImageUrl, about } = req.body;
+    const { userId, firstName, lastName, dateOfBirth, country, state, city, profileImageUrl, about, gender, interests, skills, school, qualification, college, profession } = req.body;
 
     // Calculate age from date of birth (assuming it's provided during signup)
     const age = calculateAge(dateOfBirth).toString();
 
     try {
+        // Convert interests from a comma-separated string to an array of tags
+        const interestArray = interests.split(',').map(interest => interest.trim());
+
+        // Convert skills from a comma-separated string to an array of tags
+        const skillArray = skills.split(',').map(skill => skill.trim());
+
         const user = await User.findOne({ where: { userId } });
 
         if (!user) {
@@ -191,6 +197,13 @@ const updateUserDetails = async (req, res) => {
         if (city) user.city = city;
         if (profileImageUrl) user.profileImageUrl = profileImageUrl;
         if (about) user.about = about;
+        if (gender) user.gender = gender;
+        if (interests) user.interests = interestArray;
+        if (skills) user.skills = skillArray;
+        if (school) user.school = school;
+        if (qualification) user.qualification = qualification;
+        if (college) user.college = college;
+        if (profession) user.profession = profession;
 
         // Save the updated user details
         await user.save();
@@ -218,7 +231,7 @@ const getUserDataByUserId = async (req, res) => {
 };
 
 const getUserInfoPercentage = (user) => {
-    const totalFields = 7; // Total number of user information fields (excluding userId)
+    const totalFields = 8; // Total number of user information fields (excluding userId)
     let filledFields = 0;
 
     if (user.firstName) filledFields++;
@@ -228,6 +241,7 @@ const getUserInfoPercentage = (user) => {
     if (user.state) filledFields++;
     if (user.city) filledFields++;
     if (user.profileImageUrl) filledFields++;
+    if (user.about) filledFields++;
 
     const percentage = (filledFields / totalFields) * 100;
     return percentage.toFixed(2); // Convert to percentage and round to 2 decimal places

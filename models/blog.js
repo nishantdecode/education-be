@@ -8,6 +8,10 @@ const Blog = sequelize.define('Blog', {
         primaryKey: true,
         autoIncrement: true,
     },
+    userId: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     title: {
         type: DataTypes.STRING,
         allowNull: false,

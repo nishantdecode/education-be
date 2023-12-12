@@ -6,17 +6,16 @@ const moment = require('moment');
 const { User } = require('../models/user');
 
 const createAdd = async (req, res) => {
-    const { title, owner, description, imageUrl, ownerUrl, tags } = req.body;
+    const { userId, title, owner, description, imageUrl, ownerUrl, tags } = req.body;
 
     try {
         // Convert tags from a comma-separated string to an array of tags
         const tagArray = tags.split(',').map(tag => tag.trim());
 
         // Create the blog and include the tagArray in the data
-        const blog = await createBlog({ title, owner, description, imageUrl, ownerUrl, tags: tagArray });
+        const blog = await createBlog({ userId, title, owner, description, imageUrl, ownerUrl, tags: tagArray });
 
         // Update user's usedTags
-        const userId = req.body.userId; // Assuming you have user information in req.user after authentication
         const user = await User.findByPk(userId);
 
         if (user) {
@@ -264,6 +263,27 @@ const getLastInteraction = async (req, res) => {
     }
 };
 
+const getBlogsByUserId = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const blogs = await Blog.findAll({
+            where: {
+                userId: userId,
+            },
+            order: [['createdAt', 'DESC']], // Order by createdAt in descending order
+        });
+
+        if (!blogs || blogs.length === 0) {
+            return res.status(404).json({ message: 'No blogs found for the specified user' });
+        }
+
+        res.status(200).json({ message: 'Blogs retrieved successfully', blogs });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving blogs by userId', error: error.message });
+    }
+};
+
 module.exports = {
     createAdd,
     getAllBlogs,
@@ -276,5 +296,6 @@ module.exports = {
     getLikesDislikesCount,
     getLastInteraction,
     getAllBlogsCurrentMonth,
-    getAllBlogsByClicks
+    getAllBlogsByClicks,
+    getBlogsByUserId
 };

@@ -25,6 +25,10 @@ const User = sequelize.define('User', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  gender: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   lastName: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -67,6 +71,30 @@ const User = sequelize.define('User', {
     defaultValue: 'none',
   },
   usedTags: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  interests: {
+    type: DataTypes.ARRAY(DataTypes.STRING), // Use the ARRAY data type
+    allowNull: true,
+  },
+  skills: {
+    type: DataTypes.ARRAY(DataTypes.STRING), // Use the ARRAY data type
+    allowNull: true,
+  },
+  school: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  qualification: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  college: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  profession: {
     type: DataTypes.STRING,
     allowNull: true,
   }

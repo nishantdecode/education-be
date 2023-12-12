@@ -23,4 +23,7 @@ router.get('/blogs/:id/last-interaction', blogController.getLastInteraction);
 // Get likes and dislikes count for a blog
 router.get('/blogs/:id/likes-dislikes', blogController.getLikesDislikesCount);
 
+// Get blogs by userId
+router.get('/blogs/user/:userId', blogController.getBlogsByUserId);
+
 module.exports = router;
