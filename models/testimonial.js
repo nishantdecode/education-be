@@ -24,6 +24,22 @@ const Testimonial = sequelize.define('Testimonial', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    serviceName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    question1Rating: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    question2Rating: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    question3Rating: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
 }, {
     tableName: 'Testimonials',
 });

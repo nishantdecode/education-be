@@ -2,10 +2,10 @@ const { Testimonial } = require('../models/testimonial');
 const { createTestimonial } = require('../models/testimonial');
 
 const createAdd = async (req, res) => {
-    const { name, age, message, imageUrl } = req.body;
+    const { name, age, message, imageUrl, serviceName, question1Rating, question2Rating, question3Rating } = req.body;
 
     try {
-        const testimonial = await createTestimonial({ name, age, message, imageUrl });
+        const testimonial = await createTestimonial({ name, age, message, imageUrl, serviceName, question1Rating, question2Rating, question3Rating });
         res.status(201).json({ message: 'Testimonial created successfully', testimonial });
     } catch (error) {
         res.status(500).json({ message: 'Error creating testimonial', error: error.message });
@@ -37,7 +37,7 @@ const getTestimonialById = async (req, res) => {
 
 const updateTestimonial = async (req, res) => {
     const { id } = req.params;
-    const { name, age, message, imageUrl } = req.body;
+    const { name, age, message, imageUrl, serviceName, question1Rating, question2Rating, question3Rating } = req.body;
 
     try {
         const testimonial = await Testimonial.findByPk(id);
@@ -49,6 +49,10 @@ const updateTestimonial = async (req, res) => {
         testimonial.age = age;
         testimonial.message = message;
         testimonial.imageUrl = imageUrl;
+        testimonial.serviceName = serviceName;
+        testimonial.question1Rating = question1Rating;
+        testimonial.question2Rating = question2Rating;
+        testimonial.question3Rating = question3Rating;
 
         await testimonial.save();
 
