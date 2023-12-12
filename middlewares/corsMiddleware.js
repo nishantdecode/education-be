@@ -9,4 +9,4 @@ const corsOptions = {
   credentials: true,
 };
 
-module.exports = cors(corsOptions);
+module.exports = cors();
