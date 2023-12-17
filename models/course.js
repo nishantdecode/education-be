@@ -11,6 +11,10 @@ const Course = sequelize.define('Course', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    organization: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     duration: {
         type: DataTypes.STRING,
         allowNull: false,
