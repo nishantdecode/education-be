@@ -1,3 +1,4 @@
+const cloudinary = require('cloudinary').v2;
 const { Blog } = require('../models/blog');
 const { createBlog } = require('../models/blog');
 const { BlogInteraction } = require('../models/blogInteraction');
@@ -6,14 +7,27 @@ const moment = require('moment');
 const { User } = require('../models/user');
 
 const createAdd = async (req, res) => {
-    const { userId, title, owner, description, imageUrl, ownerUrl, tags } = req.body;
+    const { userId, title, owner, description, ownerUrl, tags } = req.body;
+    console.log("Uploaded Image File:", req.files.image);
+
+    if (!req.files || !req.files.image) {
+        return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    const imageFile = req.files.image;
+    console.log("Image File Path:", imageFile.tempFilePath);
+
+    if (!imageFile.tempFilePath) {
+        return res.status(400).json({ message: 'Image file path is missing' });
+    }
 
     try {
         // Convert tags from a comma-separated string to an array of tags
         const tagArray = tags.split(',').map(tag => tag.trim());
 
-        // Create the blog and include the tagArray in the data
-        const blog = await createBlog({ userId, title, owner, description, imageUrl, ownerUrl, tags: tagArray });
+        const result = await cloudinary.uploader.upload(imageFile.tempFilePath, { folder: "edmertion" });
+
+        const blog = await createBlog({ userId, title, owner, description, imageUrl: result.url, ownerUrl, tags: tagArray });
 
         // Update user's usedTags
         const user = await User.findByPk(userId);
@@ -34,7 +48,12 @@ const createAdd = async (req, res) => {
 
         res.status(201).json({ message: 'Blog created successfully', blog });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating blog', error: error.message });
+        console.error('Error in createBlog:', error);  // Log the complete error
+        res.status(500).json({
+            message: 'Error creating Blog',
+            error: error.message,  // Send detailed error message
+            stack: error.stack     // Optionally include the stack trace
+        });
     }
 };
 

@@ -1,14 +1,35 @@
+const cloudinary = require('cloudinary').v2;
 const { Offer } = require('../models/offer');
 const { createOffer } = require('../models/offer');
 
 const createAdd = async (req, res) => {
-    const { title, description, imageUrl } = req.body;
+    const { title, description } = req.body;
+    console.log("Uploaded Image File:", req.files.image);
+
+    if (!req.files || !req.files.image) {
+        return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    const imageFile = req.files.image;
+    console.log("Image File Path:", imageFile.tempFilePath);
+
+    if (!imageFile.tempFilePath) {
+        return res.status(400).json({ message: 'Image file path is missing' });
+    }
 
     try {
-        const offer = await createOffer({ title, description, imageUrl });
+        const result = await cloudinary.uploader.upload(imageFile.tempFilePath, { folder: "edmertion" });
+
+        const offer = await createOffer({ title, description, imageUrl: result.url });
+
         res.status(201).json({ message: 'Offer created successfully', offer });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating offer', error: error.message });
+        console.error('Error in createAdd:', error);  // Log the complete error
+        res.status(500).json({
+            message: 'Error creating offer',
+            error: error.message,  // Send detailed error message
+            stack: error.stack     // Optionally include the stack trace
+        });
     }
 };
 

@@ -2,8 +2,16 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const sequelize = require('./config/db'); // Import the sequelize instance
-require('dotenv').config();
+const fileUpload = require('express-fileupload');
+const cloudinary = require('cloudinary').v2;
 
+cloudinary.config({
+  cloud_name: 'dqdrxtrw1',
+  api_key: '275662918232285',
+  api_secret: 'bwbsRQKjTdolXK1bBJ3ea2a2WVA'
+});
+
+require('dotenv').config();
 
 const corsMiddleware = require('./middlewares/corsMiddleware');
 const helmetMiddleware = require('./middlewares/helmetMiddleware');
@@ -16,13 +24,16 @@ const routes = require('./routes');
 const hostname = process.env.HOSTNAME;
 const port = process.env.PORT || 3000;
 
-
 // Use middlewares
 app.use(corsMiddleware);
 app.use(helmetMiddleware);
 app.use(limiterMiddleware);
 app.use(sanitizeMiddleware);
 app.use(logMiddleware);
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
+}));
 
 // Parse incoming JSON
 app.use(express.json());
@@ -34,7 +45,7 @@ sequelize
     console.log('Connected to PostgreSQL');
     // Start the server
     const server = http.createServer(app);
-    server.listen(port,"localhost", () => {
+    server.listen(port, "localhost", () => {
       console.log(`Server running at http://localhost:${port}/`);
     });
   })

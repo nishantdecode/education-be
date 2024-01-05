@@ -5,6 +5,7 @@ const sequelize = require('../config/db'); // Import the sequelize instance here
 const { VerificationRequest } = require('../models/verificationTag');
 const { Blog } = require('../models/blog');
 const { Op } = require('sequelize');
+const { v4: uuidv4 } = require('uuid'); // Import the UUID function
 
 const SECRET_KEY = 'EDMERTION_SECRET'; // Replace this with a secure secret key
 
@@ -62,7 +63,8 @@ const signup = async (req, res) => {
 
         // Generate a unique user ID
         const stateAcronym = state.substring(0, 2).toUpperCase();
-        const sequenceNo = "1234"; // Replace this with the actual sequence number of the user (e.g., fetched from the database)
+        const uuid = uuidv4().replace(/-/g, ""); // Remove hyphens from UUID
+        const sequenceNo = uuid.substring(0, 4); // Extract the first 4 digits
         const nameInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
         const userId = generateUserId(stateAcronym, age, sequenceNo, nameInitials);
 
