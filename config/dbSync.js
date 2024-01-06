@@ -1,5 +1,6 @@
 const sequelize = require('./db');
 const { User } = require('../models/user'); // Update the import statement for the User model
+const { Collaborate } = require('../models/collaborate');
 const { EarlyAccess } = require('../models/earlyaccess');
 const { Video } = require('../models/video');
 const { Advertisement } = require('../models/advertisement');
@@ -31,6 +32,7 @@ const { Coaching } = require('../models/coaching');
         console.log('Connected to PostgreSQL database');
 
         await User.sync(); // This will create the User table if it doesn't exist
+        await Collaborate.sync();
         await EarlyAccess.sync();
         await Video.sync();
         await Advertisement.sync(); // This will create the Advertisement table if it doesn't exist

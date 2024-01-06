@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const userRoutes = require('./userroutes');
+const collaborateRoutes = require('./collaborateroutes');
 const earlyAccessRoutes = require('./earlyaccessroutes');
 const videoRoutes = require('./videoroutes');
 const advertisementRoutes = require('./advertisementRoute');
@@ -27,6 +28,7 @@ const coachingRoutes = require('./coachingRoutes');
 
 // Mount routes
 router.use('/users', userRoutes);
+router.use('/collaborate', collaborateRoutes);
 router.use('/earlyaccess', earlyAccessRoutes);
 router.use('/videos', videoRoutes);
 router.use('/advertisements', advertisementRoutes);

@@ -11,7 +11,6 @@ const Newsletter = sequelize.define('Newsletter', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
     }
 }, {
     tableName: 'Newsletter', // Explicitly set the table name to 'Newsletter'

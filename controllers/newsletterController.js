@@ -1,3 +1,4 @@
+const sendEmail = require('../middlewares/sendMail');
 const { Newsletter } = require('../models/newsletter');
 const { submitForm } = require('../models/newsletter');
 
@@ -6,8 +7,10 @@ const apply = async (req, res) => {
 
     try {
         const submission = await submitForm({
-            email 
+            email
         });
+        const response = sendEmail(email, "Subscribed", "Dear User, You have successfully subscribed for Edmertion newsletter. You will get regular updates in your inbox.");
+
         res.status(201).json({ message: 'Form submitted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error submitting form', error: error.message });
