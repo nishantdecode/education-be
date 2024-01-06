@@ -6,9 +6,9 @@ const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
-  cloud_name: 'dqdrxtrw1',
-  api_key: '275662918232285',
-  api_secret: 'bwbsRQKjTdolXK1bBJ3ea2a2WVA'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 require('dotenv').config();
