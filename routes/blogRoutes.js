@@ -18,7 +18,7 @@ router.post('/blogs/:id/dislike', blogController.dislikeBlog);
 router.post('/blogs/:id/click', blogController.trackClick);
 
 // Get last interaction of a user with a particular blog
-router.get('/blogs/:id/last-interaction', blogController.getLastInteraction);
+router.post('/blogs/:id/last-interaction', blogController.getLastInteraction);
 
 // Get likes and dislikes count for a blog
 router.get('/blogs/:id/likes-dislikes', blogController.getLikesDislikesCount);
