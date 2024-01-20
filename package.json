@@ -18,10 +18,11 @@
   },
   "homepage": "https://bitbucket.org/aquaria-core/edmertion_node_server#readme",
   "dependencies": {
-    "aws-sdk": "^2.1376.0",
+    "aws-sdk": "^2.1540.0",
     "body-parser": "^1.20.2",
     "cloudinary": "^1.41.1",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dompurify": "^3.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",

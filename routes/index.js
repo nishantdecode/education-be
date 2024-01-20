@@ -24,6 +24,7 @@ const serviceFAQRoutes = require('./serviceFAQRoutes');
 const scholarshipRoutes = require('./scholarshipRoutes');
 const loanRoutes = require('./loanRoutes');
 const coachingRoutes = require('./coachingRoutes');
+const { FileUploadRouter } = require('./fileuploadRoutes');
 // Add other route files here if needed
 
 // Mount routes
@@ -36,6 +37,7 @@ router.use('/founder', founderRoutes);
 router.use('/testimonials', testimonialRoutes);
 router.use('/offers', offerRoutes);
 router.use('/news', newsRoutes);
+router.use('/file/upload', FileUploadRouter);
 router.use('/partner', partnerRoutes);
 router.use('/blogs', blogRoutes);
 router.use('/newsletter', newsletterRoutes);
