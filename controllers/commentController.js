@@ -25,9 +25,9 @@ const getCommentsForBlog = async (req, res) => {
 
     try {
         const comments = await Comment.findAll({
-            where: {
-                BlogId: blogId,
-            },
+            // where: {
+            //     BlogId: blogId,
+            // },
             include: [{
                 model: User,
                 attributes: ['userId','email'], // Specify the user attributes you want to include
