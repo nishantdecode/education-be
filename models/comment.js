@@ -28,10 +28,9 @@ const Comment = sequelize.define('Comment', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    userId: {
+    UserId: {
         type: DataTypes.STRING,
         allowNull: false,
-        
     },
 }, {
     tableName: 'Comments',
@@ -39,7 +38,7 @@ const Comment = sequelize.define('Comment', {
 
 // Associations
 Comment.belongsTo(Blog); // Establish the association with the Blog model
-Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
+Comment.belongsTo(User);
 
 const createComment = async (addData) => {
     try {
