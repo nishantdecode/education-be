@@ -28,7 +28,10 @@ const getCommentsForBlog = async (req, res) => {
             where: {
                 BlogId: blogId,
             },
-            include: User,
+            include: [{
+                model: User,
+                attributes: ['userId', 'email'],
+              }],
         });
 
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
