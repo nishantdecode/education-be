@@ -11,7 +11,7 @@ const create = async (req, res) => {
     try {
         const comment = await createComment({
             text,
-            UserId: userId,
+            userId: userId,
             BlogId: blogId,
         });
 
