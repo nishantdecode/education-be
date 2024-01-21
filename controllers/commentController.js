@@ -30,7 +30,7 @@ const getCommentsForBlog = async (req, res) => {
             },
             include: [{
                 model: User,
-                attributes: ['id', 'email'], // Specify the user attributes you want to include
+                attributes: ['email'], // Specify the user attributes you want to include
               }],
         });
 
