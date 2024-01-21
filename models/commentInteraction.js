@@ -18,7 +18,7 @@ const CommentInteraction = sequelize.define('CommentInteraction', {
 
 // Associations
 CommentInteraction.belongsTo(Comment);
-CommentInteraction.belongsTo(User, { foreignKey: 'UserId', targetKey: 'userId' });
+CommentInteraction.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
 
 module.exports = {
     CommentInteraction
