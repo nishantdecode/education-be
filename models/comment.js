@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { Blog } = require('./blog');
+const { User } = require('./user');
 
 const Comment = sequelize.define('Comment', {
     id: {
@@ -27,12 +28,17 @@ const Comment = sequelize.define('Comment', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    userId: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 }, {
     tableName: 'Comments',
 });
 
 // Associations
 Comment.belongsTo(Blog); // Establish the association with the Blog model
+Comment.belongsTo(User, { foreignKey: 'userId' });
 
 const createComment = async (addData) => {
     try {

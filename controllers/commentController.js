@@ -1,6 +1,7 @@
 const { Comment, createComment } = require('../models/comment');
 const { CommentInteraction } = require('../models/commentInteraction');
 const { CommentReport } = require('../models/commentReport');
+const { User } = require('../models/user');
 
 const create = async (req, res) => {
     const { text, userId } = req.body;
@@ -27,6 +28,10 @@ const getCommentsForBlog = async (req, res) => {
             where: {
                 BlogId: blogId,
             },
+            include: [{
+                model: User,
+                attributes: ['id', 'email'], // Specify the user attributes you want to include
+              }],
         });
 
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
