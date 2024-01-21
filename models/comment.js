@@ -30,7 +30,11 @@ const Comment = sequelize.define('Comment', {
     },
     userId: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: 'User', // Make sure it matches the actual table name for User
+            key: 'userId',
+        },
     },
 }, {
     tableName: 'Comments',
