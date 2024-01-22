@@ -116,7 +116,7 @@ const getLastInteraction = async (req, res) => {
                 UserId: userId,
                 CommentId: id,
             },
-            order: [['interactionTimestamp', 'DESC']],
+            order: [['createdAt', 'DESC']],
         });
 
         res.status(200).json({ lastInteraction });
