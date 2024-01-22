@@ -179,11 +179,10 @@ const updateUserDetails = async (req, res) => {
 
     try {
         // Convert interests from a comma-separated string to an array of tags
-        const interestArray = interests.split(',').map(interest => interest.trim());
+        const interestArray = interests ? interests.split(',').map(interest => interest.trim()) : []
 
         // Convert skills from a comma-separated string to an array of tags
-        const skillArray = skills.split(',').map(skill => skill.trim());
-
+        const skillArray = skills ? skills?.split(',').map(skill => skill.trim()) : []
         const user = await User.findOne({ where: { userId } });
 
         if (!user) {
