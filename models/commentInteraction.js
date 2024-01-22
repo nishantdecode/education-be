@@ -14,6 +14,11 @@ const CommentInteraction = sequelize.define('CommentInteraction', {
         type: DataTypes.ENUM('like', 'dislike'),
         allowNull: false,
     },
+    interactionTimestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
 });
 
 // Associations
