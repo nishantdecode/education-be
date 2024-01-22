@@ -106,7 +106,24 @@ const likeComment = async (req, res) => {
 const dislikeComment = async (req, res) => {
     await likeDislikeComment(req, res, 'dislike');
 };
+const getLastInteraction = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.body.userId;
 
+    try {
+        const lastInteraction = await CommentInteraction.findOne({
+            where: {
+                UserId: userId,
+                CommentId: id,
+            },
+            order: [['interactionTimestamp', 'DESC']],
+        });
+
+        res.status(200).json({ lastInteraction });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving last interaction', error: error.message });
+    }
+};
 const reportComment = async (req, res) => {
     const commentId = req.params.id;
     const userId = req.body.userId; // Assuming you have user information in req.user after authentication
@@ -134,5 +151,6 @@ module.exports = {
     likeComment,
     dislikeComment,
     reportComment,
+    getLastInteraction,
     getCommentsForBlog
 };
