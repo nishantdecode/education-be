@@ -42,6 +42,15 @@ const getCommentsForBlog = async (req, res) => {
                 limit:1
                 // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
+            include:  [{
+                model: CommentReport,
+                where: {
+                    UserId:userId
+                },
+                order: [['createdAt', 'DESC']],
+                limit:1
+                // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+            }],
             // raw:true,
         });
         // const result = []
