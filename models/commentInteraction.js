@@ -23,7 +23,7 @@ const CommentInteraction = sequelize.define('CommentInteraction', {
 
 // Associations
 CommentInteraction.belongsTo(Comment);
-// Comment.hasMany(CommentInteraction); 
+//Comment.hasMany(CommentInteraction); 
 CommentInteraction.belongsTo(User, { foreignKey: 'UserId', targetKey: 'userId' });
 // CommentInteraction.belongsTo(User, { foreignKey: 'UserId', targetKey: 'userId' });
 
