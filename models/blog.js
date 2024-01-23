@@ -55,6 +55,9 @@ const Blog = sequelize.define('Blog', {
     tableName: 'Blogs',
 });
 
+Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
+
+
 const createBlog = async (addData) => {
     try {
         const add = await Blog.create(addData);
