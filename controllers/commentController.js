@@ -35,6 +35,9 @@ const getCommentsForBlog = async (req, res) => {
             }],
             include:  [{
                 model: CommentInteraction,
+                where: {
+                    UserId:userId
+                }
                 // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
             // raw:true,
