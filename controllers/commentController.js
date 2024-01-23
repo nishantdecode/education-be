@@ -31,20 +31,17 @@ const getCommentsForBlog = async (req, res) => {
             },
             include:  [{
                 model: User,
-                
                 attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
-            include: [{
-                model: CommentInteraction,
-                // where: {
-                //   UserId: userId,
-                // },
-                order: [['createdAt', 'DESC']], // Assuming there is a createdAt field in Child
-                limit: 1,
-              }],
-
         });
-
+        // for (let i = 0 ; i<=comments.length ; i++){
+        //     const interactions = await CommentInteraction.findOne({
+        //         where: {
+        //             UserId: userId,
+        //             CommentId: comments[i].co,
+        //         },
+        //     });
+        // }
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving comments', error: error.message });
