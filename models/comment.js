@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { Blog } = require('./blog');
 const { User } = require('./user');
-const { CommentInteraction } = require('./commentInteraction');
+// const { CommentInteraction } = require('./commentInteraction');
 
 const Comment = sequelize.define('Comment', {
     id: {
