@@ -34,14 +34,16 @@ const getCommentsForBlog = async (req, res) => {
                 attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
         });
-        // for (let i = 0 ; i<=comments.length ; i++){
-        //     const interactions = await CommentInteraction.findOne({
-        //         where: {
-        //             UserId: userId,
-        //             CommentId: comments[i].co,
-        //         },
-        //     });
-        // }
+        for (let i = 0 ; i<=comments.length ; i++){
+            const last_interaction = await CommentInteraction.findOne({
+                where: {
+                    UserId: userId,
+                    CommentId: comments[i].CommentId,
+                },
+                order: [['createdAt', 'DESC']],
+            });
+            comments[i].last_interaction = last_interaction;
+        }
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving comments', error: error.message });
