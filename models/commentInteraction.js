@@ -14,12 +14,18 @@ const CommentInteraction = sequelize.define('CommentInteraction', {
         type: DataTypes.ENUM('like', 'dislike'),
         allowNull: false,
     },
+    // CommentId:{
+    //     type: DataTypes.INTEGER,
+    //     allowNull: false,
+    // }
  
 });
 
 // Associations
 CommentInteraction.belongsTo(Comment);
 CommentInteraction.belongsTo(User, { foreignKey: 'UserId', targetKey: 'userId' });
+// CommentInteraction.belongsTo(User, { foreignKey: 'UserId', targetKey: 'userId' });
+
 
 module.exports = {
     CommentInteraction

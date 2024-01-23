@@ -23,7 +23,7 @@ const create = async (req, res) => {
 
 const getCommentsForBlog = async (req, res) => {
     const blogId = req.params.id; // Assuming the blog id is available in the request
-
+    const userId = req.body.userId
     try {
         const comments = await Comment.findAll({
             where: {
@@ -31,8 +31,18 @@ const getCommentsForBlog = async (req, res) => {
             },
             include:  [{
                 model: User,
+                
                 attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+            }],
+            include: [{
+                model: CommentInteraction,
+                // where: {
+                //   UserId: userId,
+                // },
+                order: [['createdAt', 'DESC']], // Assuming there is a createdAt field in Child
+                limit: 1,
               }],
+
         });
 
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
