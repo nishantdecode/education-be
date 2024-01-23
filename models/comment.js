@@ -39,7 +39,7 @@ const Comment = sequelize.define('Comment', {
 
 // Associations
 Comment.belongsTo(Blog); // Establish the association with the Blog model
-Comment.belongsTo(CommentInteraction); // Establish the association with the Blog model
+// Comment.belongsTo(CommentInteraction); // Establish the association with the Blog model
 Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
 
 const createComment = async (addData) => {
