@@ -35,6 +35,7 @@ const getCommentsForBlog = async (req, res) => {
             }],
         });
         for (let i = 0 ; i<=comments.length ; i++){
+            console.log({commentId:comments[i].CommentId})
             const last_interaction = await CommentInteraction.findOne({
                 where: {
                     UserId: userId,
