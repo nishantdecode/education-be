@@ -60,6 +60,10 @@ const createAdd = async (req, res) => {
 const getAllBlogs = async (req, res) => {
     try {
         const blogs = await Blog.findAll({
+            include:  [{
+                model: User,
+                attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+            }],
             order: [['likes', 'DESC']], // Order by likes in descending order
         });
         res.status(200).json({ message: 'All blogs retrieved successfully', blogs });
