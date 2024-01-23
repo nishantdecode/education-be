@@ -42,7 +42,7 @@ const getCommentsForBlog = async (req, res) => {
             const last_interaction = await CommentInteraction.findOne({
                 where: {
                     UserId: userId,
-                    CommentId: comments[i].CommentId,
+                    CommentId: comments[i].id,
                 },
                 order: [['createdAt', 'DESC']],
             });
