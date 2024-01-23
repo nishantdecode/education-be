@@ -37,7 +37,9 @@ const getCommentsForBlog = async (req, res) => {
                 model: CommentInteraction,
                 where: {
                     UserId:userId
-                }
+                },
+                order: [['createdAt', 'DESC']],
+                limit:1
                 // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
             // raw:true,
