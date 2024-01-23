@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-
+const {User} = require("./user")
 const Blog = sequelize.define('Blog', {
     id: {
         type: DataTypes.INTEGER,
@@ -55,7 +55,7 @@ const Blog = sequelize.define('Blog', {
     tableName: 'Blogs',
 });
 
-Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
+Blog.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
 
 
 const createBlog = async (addData) => {
