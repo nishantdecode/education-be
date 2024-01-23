@@ -26,7 +26,6 @@ const getCommentsForBlog = async (req, res) => {
     const userId = req.body.userId
     try {
         const comments = await Comment.findAll({
-            raw:true,
             where: {
                 BlogId: blogId,
             },
@@ -34,11 +33,11 @@ const getCommentsForBlog = async (req, res) => {
                 model: User,
                 attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
+            raw:true,
         });
         const result = []
         for (let i = 0 ; i<=comments.length ; i++){
-            
-            console.log({commentId:comments[i]})
+            // console.log({commentId:comments[i]})
             const last_interaction = await CommentInteraction.findOne({
                 where: {
                     UserId: userId,
