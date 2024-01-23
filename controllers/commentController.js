@@ -33,20 +33,24 @@ const getCommentsForBlog = async (req, res) => {
                 model: User,
                 attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
             }],
-            raw:true,
+            include:  [{
+                model: CommentInteraction,
+                // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+            }],
+            // raw:true,
         });
-        const result = []
-        for (let i = 0 ; i<=comments.length ; i++){
-            // console.log({commentId:comments[i]})
-            const last_interaction = await CommentInteraction.findOne({
-                where: {
-                    UserId: userId,
-                    CommentId: comments[i].id,
-                },
-                order: [['createdAt', 'DESC']],
-            });
-            comments[i].last_interaction = last_interaction;
-        }
+        // const result = []
+        // for (let i = 0 ; i<=comments.length ; i++){
+        //     // console.log({commentId:comments[i]})
+        //     const last_interaction = await CommentInteraction.findOne({
+        //         where: {
+        //             UserId: userId,
+        //             CommentId: comments[i].id,
+        //         },
+        //         order: [['createdAt', 'DESC']],
+        //     });
+        //     comments[i].last_interaction = last_interaction;
+        // }
         res.status(200).json({ message: 'Comments retrieved successfully', comments });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving comments', error: error.message });

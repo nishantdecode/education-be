@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { Blog } = require('./blog');
 const { User } = require('./user');
+const { CommentInteraction } = require('./commentInteraction');
 
 const Comment = sequelize.define('Comment', {
     id: {
@@ -38,6 +39,7 @@ const Comment = sequelize.define('Comment', {
 
 // Associations
 Comment.belongsTo(Blog); // Establish the association with the Blog model
+Comment.hasMany(CommentInteraction); // Establish the association with the Blog model
 // Comment.belongsTo(CommentInteraction); // Establish the association with the Blog model
 Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
 
