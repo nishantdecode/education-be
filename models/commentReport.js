@@ -8,6 +8,10 @@ const CommentReport = sequelize.define('CommentReport', {
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
+    },
+    UserId:{
+        type: DataTypes.STRING,
+        // allowNull: false
     }
 });
 
