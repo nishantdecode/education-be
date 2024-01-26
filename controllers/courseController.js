@@ -67,7 +67,7 @@ const importCourseData = async (req, res) => {
         // }
         // await Promise.all(promises);
           
-        res.status(201).json({ message: 'Course created successfully', file });
+        res.status(201).json({ message: 'Course created successfully', file:file.toString('utf-8') });
     } catch (error) {
         res.status(500).json({ message: 'Error creating course', error: error.message });
     }
