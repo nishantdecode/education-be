@@ -20,22 +20,22 @@ const importCourseData = async (req, res) => {
         const result = excelToJson({
             source: file, // fs.readFileSync return a Buffer
           });
-          console.log({result})
+        //   console.log({result})
         // const promises = [];
         if(platform === "Udemy"){
             for (let row of result?.Sheet1) {
-                const title = row.A;
-                const url = row.B;
+                let title = row.A;
+                let url = row.B;
                 let price = row.C;
-                const language = row.D;
-                const level = row.E;
+                let language = row.D;
+                let level = row.E;
                 let enrollments = row.F;
-                const rating = row.G;
-                const reviews = row.H;
-                const lectures = row.I;
-                const category = row.J;
-                const subtitles = row.K;
-                const duration = row.L;
+                let rating = row.G;
+                let reviews = row.H;
+                let lectures = row.I;
+                let category = row.J;
+                let subtitles = row.K;
+                let duration = row.L;
 
                 if(price === "FREE"){
                     price = 0
