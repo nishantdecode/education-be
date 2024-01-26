@@ -133,4 +133,5 @@ module.exports = {
     getCourseById,
     updateCourse,
     deleteCourse,
+    importCourseData
 };
