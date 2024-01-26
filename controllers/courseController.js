@@ -20,6 +20,7 @@ const importCourseData = async (req, res) => {
         const result = excelToJson({
             source: file, // fs.readFileSync return a Buffer
           });
+          console.log({result})
         // const promises = [];
         if(platform === "Udemy"){
             for (let row of result?.Sheet1) {
