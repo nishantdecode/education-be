@@ -36,7 +36,7 @@ app.use(fileUpload({
 }));
 
 // Parse incoming JSON
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
 
 // Connect to PostgreSQL
 sequelize
