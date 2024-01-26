@@ -16,7 +16,7 @@ const importCourseData = async (req, res) => {
         // const excel = req.file;
         const excel = req.files.file
         const file = fs.readFileSync(excel.tempFilePath)
-        // const {platform} = req.query;
+        const {platform} = req.query;
         const result = excelToJson({
             source: file, // fs.readFileSync return a Buffer
           });
