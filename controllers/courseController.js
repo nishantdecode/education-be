@@ -13,57 +13,58 @@ const create = async (req, res) => {
 const importCourseData = async (req, res) => {
     try {
         // const course = await createCourse(req.body);
-        const excel = req.file;
-        const {platform} = req.query;
-        const result = excelToJson({
-            source: req.file.buffer, // fs.readFileSync return a Buffer
-          });
-        const promises = [];
-        if(platform === "Udemy"){
-            for await (let row of result?.Sheet1) {
-                const title = row.A;
-                const url = row.B;
-                let price = row.C;
-                const language = row.D;
-                const level = row.E;
-                let enrollments = row.F;
-                const rating = row.G;
-                const reviews = row.H;
-                const lectures = row.I;
-                const category = row.J;
-                const subtitles = row.K;
-                const duration = row.L;
+        // const excel = req.file;
+        const excel = req.files.file
+        // const {platform} = req.query;
+        // const result = excelToJson({
+        //     source: req.file.buffer, // fs.readFileSync return a Buffer
+        //   });
+        // const promises = [];
+        // if(platform === "Udemy"){
+        //     for await (let row of result?.Sheet1) {
+        //         const title = row.A;
+        //         const url = row.B;
+        //         let price = row.C;
+        //         const language = row.D;
+        //         const level = row.E;
+        //         let enrollments = row.F;
+        //         const rating = row.G;
+        //         const reviews = row.H;
+        //         const lectures = row.I;
+        //         const category = row.J;
+        //         const subtitles = row.K;
+        //         const duration = row.L;
 
-                if(price === "FREE"){
-                    price = 0
-                }else if(price) {
-                    price = parseFloat(price.slice(1,price.length));
-                }
-                if(enrollments){
-                    enrollments = parseInt(enrollments)
-                }
-                if(rating){
-                    rating = parseFloat(rating)
-                }
-                if(reviews){
-                    reviews = parseInt(reviews)
-                }
-                promises.push(createCourse({
-                    title,
-                    platform,
-                    duration,
-                    mode:"ONLINE",
-                    language,
-                    reviews,
-                    averageRating:rating,
-                    price,
-                    numberOfEnrollments:enrollments,
-                    level,
-                    url,
-                }))
-            }
-        }
-        await Promise.all(promises);
+        //         if(price === "FREE"){
+        //             price = 0
+        //         }else if(price) {
+        //             price = parseFloat(price.slice(1,price.length));
+        //         }
+        //         if(enrollments){
+        //             enrollments = parseInt(enrollments)
+        //         }
+        //         if(rating){
+        //             rating = parseFloat(rating)
+        //         }
+        //         if(reviews){
+        //             reviews = parseInt(reviews)
+        //         }
+        //         promises.push(createCourse({
+        //             title,
+        //             platform,
+        //             duration,
+        //             mode:"ONLINE",
+        //             language,
+        //             reviews,
+        //             averageRating:rating,
+        //             price,
+        //             numberOfEnrollments:enrollments,
+        //             level,
+        //             url,
+        //         }))
+        //     }
+        // }
+        // await Promise.all(promises);
           
         res.status(201).json({ message: 'Course created successfully', excel });
     } catch (error) {
