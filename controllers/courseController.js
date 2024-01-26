@@ -17,9 +17,9 @@ const importCourseData = async (req, res) => {
         const excel = req.files.file
         const file = fs.readFileSync(excel.tempFilePath)
         // const {platform} = req.query;
-        // const result = excelToJson({
-        //     source: excel.data, // fs.readFileSync return a Buffer
-        //   });
+        const result = excelToJson({
+            source: file.data, // fs.readFileSync return a Buffer
+          });
         // const promises = [];
         // if(platform === "Udemy"){
         //     for await (let row of result?.Sheet1) {
@@ -67,7 +67,7 @@ const importCourseData = async (req, res) => {
         // }
         // await Promise.all(promises);
           
-        res.status(201).json({ message: 'Course created successfully', file });
+        res.status(201).json({ message: 'Course created successfully', result });
     } catch (error) {
         res.status(500).json({ message: 'Error creating course', error: error.message });
     }
