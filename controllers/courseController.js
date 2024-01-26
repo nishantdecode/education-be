@@ -20,9 +20,9 @@ const importCourseData = async (req, res) => {
         const result = excelToJson({
             source: file, // fs.readFileSync return a Buffer
           });
-        const promises = [];
+        // const promises = [];
         if(platform === "Udemy"){
-            for await (let row of result?.Sheet1) {
+            for (let row of result?.Sheet1) {
                 const title = row.A;
                 const url = row.B;
                 let price = row.C;
@@ -50,7 +50,7 @@ const importCourseData = async (req, res) => {
                 if(reviews){
                     reviews = parseInt(reviews)
                 }
-                promises.push(createCourse({
+                await createCourse({
                     title,
                     platform,
                     duration,
@@ -62,10 +62,10 @@ const importCourseData = async (req, res) => {
                     numberOfEnrollments:enrollments,
                     level,
                     url,
-                }))
+                })
             }
         }
-        await Promise.all(promises);
+        // await Promise.all(promises);
           
         res.status(201).json({ message: 'Course created successfully' });
     } catch (error) {
