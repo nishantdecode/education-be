@@ -13,7 +13,7 @@ const Course = sequelize.define('Course', {
     },
     organization: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     duration: {
         type: DataTypes.STRING,
@@ -48,7 +48,7 @@ const Course = sequelize.define('Course', {
     },
     instructor: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     level: {
         type: DataTypes.STRING,
