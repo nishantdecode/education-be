@@ -65,6 +65,141 @@ const importCourseData = async (req, res) => {
                     url,
                 })
             }
+            
+        }
+        if(platform === "Coursea"){
+            for (let row of result?.Sheet1) {
+                let url = row.A;
+                let title = row.B;
+                let organization = row.C
+                let rating = row.D;
+                let enrollments = row.F;
+                let level = row.H;
+                let duration = row.I;
+                let language = row.J;
+                let price = row.L;
+                // let reviews = row.H;
+                // let lectures = row.I;
+                // let category = row.J;
+                // let subtitles = row.K;
+
+                if(price === "FREE"){
+                    price = 0
+                }else if(price) {
+                    price = parseFloat(price.slice(1,price.length));
+                }
+                if(enrollments){
+                    enrollments = parseInt(enrollments)
+                }
+                if(rating){
+                    rating = parseFloat(rating)
+                }
+                
+                await createCourse({
+                    title,
+                    platform,
+                    duration,
+                    mode:"ONLINE",
+                    language,
+                    averageRating:rating,
+                    price,
+                    numberOfEnrollments:enrollments,
+                    level,
+                    url,
+                    organization
+                })
+            }
+            
+        }
+        if(platform === "Skillshare"){
+            for (let row of result?.Sheet1) {
+                let url = row.A;
+                let title = row.B;
+                let enrollments = row.D;
+                let level = row.E;
+                let duration = row.F;
+                let instructor = row.G
+                let rating = row.I;
+                // let organization = row.C
+                // let language = row.J;
+                // let price = row.L;
+                // let reviews = row.H;
+                // let lectures = row.I;
+                // let category = row.J;
+                // let subtitles = row.K;
+
+                // if(price === "FREE"){
+                //     price = 0
+                // }else if(price) {
+                //     price = parseFloat(price.slice(1,price.length));
+                // }
+                if(enrollments){
+                    enrollments = parseInt(enrollments)
+                }
+                if(rating){
+                    rating = parseFloat(rating)
+                }
+                
+                await createCourse({
+                    title,
+                    platform,
+                    duration,
+                    mode:"ONLINE",
+                    // language,
+                    averageRating:rating,
+                    // price,
+                    instructor,
+                    numberOfEnrollments:enrollments,
+                    level,
+                    url,
+                    organization
+                })
+            }
+            
+        }
+        if(platform === "Edx"){
+            for (let row of result?.Sheet1) {
+                let enrollments = row.A;
+                let title = row.B;
+                let organization = row.C
+                let language = row.D;
+                let level = row.E;
+                let price = row.G;
+                let duration = row.I;
+                let url = row.J;
+                // let rating = row.D;
+                // let reviews = row.H;
+                // let lectures = row.I;
+                // let category = row.J;
+                // let subtitles = row.K;
+
+                if(price === "FREE"){
+                    price = 0
+                }else if(price) {
+                    price = parseFloat(price.slice(1,price.length));
+                }
+                if(enrollments){
+                    enrollments = parseInt(enrollments)
+                }
+                if(rating){
+                    rating = parseFloat(rating)
+                }
+                
+                await createCourse({
+                    title,
+                    platform,
+                    duration,
+                    mode:"ONLINE",
+                    language,
+                    // averageRating:rating,
+                    price,
+                    numberOfEnrollments:enrollments,
+                    level,
+                    url,
+                    organization
+                })
+            }
+            
         }
         // await Promise.all(promises);
           
