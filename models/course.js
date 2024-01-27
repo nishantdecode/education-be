@@ -25,7 +25,7 @@ const Course = sequelize.define('Course', {
     },
     language: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     reviews: {
         type: DataTypes.INTEGER,
