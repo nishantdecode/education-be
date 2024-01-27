@@ -181,9 +181,9 @@ const importCourseData = async (req, res) => {
                 if(enrollments){
                     enrollments = parseInt(enrollments)
                 }
-                if(rating){
-                    rating = parseFloat(rating)
-                }
+                // if(rating){
+                //     rating = parseFloat(rating)
+                // }
                 
                 await createCourse({
                     title,
