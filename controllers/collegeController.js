@@ -12,8 +12,32 @@ const create = async (req, res) => {
 const importCollegeData = async (req,res) =>{
     try {
         // const college = await createCollege(req.body);
-        const college = data1
-        res.status(201).json({ message: 'College created successfully', college });
+        const colleges = data1
+        const result = {
+            admission:[],
+            course_info:[],
+            placements:[],
+            infrastructure:[],
+            other_facilities:[]
+        };
+        for (let ele of colleges){
+            if(ele.admission.length > 0){
+                result.admission.push(ele)
+            }
+            if(ele.course_info.length > 0){
+                result.course_info.push(ele)
+            }
+            if(ele.placements.length > 0){
+                result.placements.push(ele)
+            }
+            if(ele.infrastructure.length > 0){
+                result.infrastructure.push(ele)
+            }
+            if(ele.other_facilities.length > 0){
+                result.other_facilities.push(ele)
+            }
+        }
+        res.status(201).json({ message: 'College created successfully', result });
     } catch (error) {
         res.status(500).json({ message: 'Error creating college', error: error.message });
     }
