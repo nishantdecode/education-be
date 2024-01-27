@@ -156,7 +156,7 @@ const importCourseData = async (req, res) => {
                     numberOfEnrollments:enrollments,
                     level,
                     url,
-                    organization
+                    // organization:platform
                 })
             }
             

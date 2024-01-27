@@ -39,7 +39,7 @@ const Course = sequelize.define('Course', {
     },
     price: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
     },
     numberOfEnrollments: {
         type: DataTypes.INTEGER,
