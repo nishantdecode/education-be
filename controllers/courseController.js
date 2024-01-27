@@ -91,8 +91,12 @@ const importCourseData = async (req, res) => {
                 if(enrollments){
                     enrollments = parseInt(enrollments)
                 }
-                if(rating){
-                    rating = parseFloat(rating)
+                if(rating){ 
+                    if(rating === "NA"){
+                        rating = 0
+                    }else {
+                        rating = parseFloat(rating)
+                    }
                 }
                 
                 await createCourse({
