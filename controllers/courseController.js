@@ -180,7 +180,11 @@ const importCourseData = async (req, res) => {
                 }
                 if(enrollments){
                     console.log({enrollments})
-                    enrollments = parseInt(enrollments)
+                    if(enrollments === "-"){
+                        enrollments = 0
+                    }else{
+                        enrollments = parseInt(enrollments)
+                    }
                     console.log({enrollments})
 
                 }
