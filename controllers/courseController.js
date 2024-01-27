@@ -179,7 +179,10 @@ const importCourseData = async (req, res) => {
                     price = parseFloat(price);
                 }
                 if(enrollments){
+                    console.log({enrollments})
                     enrollments = parseInt(enrollments)
+                    console.log({enrollments})
+
                 }
                 // if(rating){
                 //     rating = parseFloat(rating)
