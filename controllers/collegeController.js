@@ -1,6 +1,6 @@
 // controllers/collegeController.js
 const { College, createCollege } = require('../models/college');
-
+const data1 = require("../data/college_data_final1.json")
 const create = async (req, res) => {
     try {
         const college = await createCollege(req.body);
@@ -9,7 +9,15 @@ const create = async (req, res) => {
         res.status(500).json({ message: 'Error creating college', error: error.message });
     }
 };
-
+const importCollegeData = async (req,res) =>{
+    try {
+        // const college = await createCollege(req.body);
+        const college = data1
+        res.status(201).json({ message: 'College created successfully', college });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating college', error: error.message });
+    }
+}
 const getAllColleges = async (req, res) => {
     try {
         const colleges = await College.findAll();
@@ -73,4 +81,5 @@ module.exports = {
     getCollegeById,
     updateCollege,
     deleteCollege,
+    importCollegeData
 };

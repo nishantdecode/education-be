@@ -4,6 +4,7 @@ const router = express.Router();
 const collegeController = require('../controllers/collegeController');
 
 router.post('/', collegeController.create);
+router.post('/import', collegeController.importCollegeData);
 router.get('/', collegeController.getAllColleges);
 router.get('/:id', collegeController.getCollegeById);
 router.put('/:id', collegeController.updateCollege);
