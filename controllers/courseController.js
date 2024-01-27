@@ -86,7 +86,7 @@ const importCourseData = async (req, res) => {
                 if(price === "FREE"){
                     price = 0
                 }else if(price) {
-                    price = parseFloat(price.slice(1,price.length));
+                    price = parseFloat(price);
                 }
                 if(enrollments){
                     enrollments = parseInt(enrollments)
@@ -176,7 +176,7 @@ const importCourseData = async (req, res) => {
                 if(price === "FREE"){
                     price = 0
                 }else if(price) {
-                    price = parseFloat(price.slice(1,price.length));
+                    price = parseFloat(price);
                 }
                 if(enrollments){
                     enrollments = parseInt(enrollments)
