@@ -27,65 +27,52 @@ const getCommentsForBlog = async (req, res) => {
   const blogId = req.params.id; // Assuming the blog id is available in the request
   const userId = req.body.userId;
   try {
-    const comments = await Comment.findAll({
-      where: {
-        BlogId: blogId,
-      },
-      include: [
-        {
-          model: User,
-          attributes: [
-            "userId",
-            "firstName",
-            "email",
-            "mobile",
-            "lastName",
-            "profileImageUrl",
-          ],
+    let comments;
+    if (userId) {
+      comments = await Comment.findAll({
+        where: {
+          BlogId: blogId,
         },
-        {
-          model: CommentInteraction,
-          where: {
-            UserId: userId,
+        include: [
+          {
+            model: User,
+            attributes: [
+              "userId",
+              "firstName",
+              "email",
+              "mobile",
+              "lastName",
+              "profileImageUrl",
+            ],
           },
-          order: [["createdAt", "DESC"]],
-          limit: 1,
-          // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
-        },
-        {
-          model: CommentReport,
-          where: {
-            UserId: userId,
+          {
+            model: CommentInteraction,
+            where: {
+              UserId: userId,
+            },
+            order: [["createdAt", "DESC"]],
+            limit: 1,
+            // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
           },
-          order: [["createdAt", "DESC"]],
-          limit: 1,
-          // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+          {
+            model: CommentReport,
+            where: {
+              UserId: userId,
+            },
+            order: [["createdAt", "DESC"]],
+            limit: 1,
+            // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+          },
+        ],
+      
+      });
+    }else{
+      comments = await Comment.findAll({
+        where: {
+          BlogId: blogId,
         },
-      ],
-      // include:  [],
-      // include:  [{
-      //     model: CommentReport,
-      //     where: {
-      //         UserId:userId
-      //     },
-      //     order: [['createdAt', 'DESC']],
-      //     limit:1
-      //     // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
-      // }],
-      // raw:true,
-    });
-    // const result = []
-    // for (let i = 0 ; i<=comments.length ; i++){
-    //     // console.log({commentId:comments[i]})
-    //     const last_interaction = await CommentInteraction.findOne({
-    //         where: {
-    //             UserId: userId,
-    //             CommentId: comments[i].id,
-    //         },
-    //         order: [['createdAt', 'DESC']],
-    //     });
-    //     comments[i].last_interaction = last_interaction;
-    // }
+      });
+    }
     res
       .status(200)
       .json({ message: "Comments retrieved successfully", comments });
@@ -178,12 +165,10 @@ const getLastInteraction = async (req, res) => {
 
     res.status(200).json({ lastInteraction });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving last interaction",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving last interaction",
+      error: error.message,
+    });
   }
 };
 const reportComment = async (req, res) => {
