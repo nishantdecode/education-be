@@ -65,7 +65,7 @@ const College = sequelize.define(
       defaultValue: [],
     },
     admission:{
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.ARRAY(DataTypes.JSONB),
       allowNull: false,
       defaultValue: [],
     },

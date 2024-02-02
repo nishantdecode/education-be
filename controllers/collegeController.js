@@ -15,7 +15,7 @@ const importCollegeData = async (req, res) => {
   try {
     // const college = await createCollege(req.body);
     const colleges = data1;
-    const result = [];
+    // const result = [];
     for (let college of colleges) {
       let rating = college.rating;
       let review = college.review_count;
@@ -25,7 +25,8 @@ const importCollegeData = async (req, res) => {
       if (review) {
         review = parseInt(review.split(" ")[0].trim().substr(1));
       }
-      result.push({
+      // result.push();
+      await createCollege({
         name: college.clgname,
         course_data: college.course_info,
         url: college.url,
@@ -36,16 +37,8 @@ const importCollegeData = async (req, res) => {
         features_rating: college.features_rating,
         other_facilities: college.other_facilities,
       });
-      // await createCollege({
-      //     name:college.clgname,
-      //     course_data:college.course_info,
-      //     url:college.url,
-      //     location:college.location,
-      //     infrastructure:college.infrastructure,
-
-      // });
     }
-    res.status(201).json({ message: "College created successfully", result });
+    res.status(201).json({ message: "College created successfully" });
   } catch (error) {
     res
       .status(500)
