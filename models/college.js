@@ -74,6 +74,11 @@ const College = sequelize.define(
       allowNull: false,
       defaultValue: [],
     },
+    features_rating:{
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: []
+    },
     other_facilities:{
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
