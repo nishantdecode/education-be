@@ -31,6 +31,8 @@ const importCollegeData = async (req, res) => {
         course_data: college.course_info,
         url: college.url,
         location: college.location,
+        rating:rating,
+        review:review,
         infrastructure: college.infrastructure,
         specialization: college.specialization,
         admission: college.admission,
