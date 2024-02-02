@@ -20,7 +20,7 @@ const College = sequelize.define(
     },
     fees: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     duration: {
       type: DataTypes.STRING,
@@ -45,7 +45,7 @@ const College = sequelize.define(
     },
     seats: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     url: {
       type: DataTypes.STRING,
@@ -57,9 +57,24 @@ const College = sequelize.define(
     },
     averagePackage: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    specialization:{
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
+      defaultValue: [],
+    },
+    admission:{
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: [],
     },
     infrastructure: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: [],
+    },
+    other_facilities:{
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
       defaultValue: [],
