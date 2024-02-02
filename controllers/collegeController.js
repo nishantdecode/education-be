@@ -1,6 +1,15 @@
 // controllers/collegeController.js
 const { College, createCollege } = require("../models/college");
 const data1 = require("../data/college_data_final1.json");
+const data2 = require("../data/college_data_final2.json");
+const data3 = require("../data/college_data_final3.json");
+const data4 = require("../data/college_data_final4.json");
+const data5 = require("../data/college_data_final5.json");
+const data6 = require("../data/college_data_final6.json");
+const data7 = require("../data/college_data_final7.json");
+const data8 = require("../data/college_data_final8.json");
+const data9 = require("../data/college_data_final9.json");
+
 const create = async (req, res) => {
   try {
     const college = await createCollege(req.body);
@@ -14,7 +23,7 @@ const create = async (req, res) => {
 const importCollegeData = async (req, res) => {
   try {
     // const college = await createCollege(req.body);
-    const colleges = data1;
+    const colleges = [...data1,...data2,...data3,...data4,...data5,...data6,...data7,...data8,...data9];
     // const result = [];
     for (let college of colleges) {
       let rating = college.rating;
