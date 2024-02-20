@@ -221,7 +221,19 @@ const importCourseData = async (req, res) => {
 };
 const getAllCourses = async (req, res) => {
     try {
-        const courses = await Course.findAll();
+        let {page,show} = req.query
+        if(page){
+            page = parseInt(page)
+        }
+        if(show){
+            show = parseInt(show)
+        }
+        let courses;
+        if(page && show){
+            courses = await Course.findAll({offset:page * show,limit:show});
+        }else {
+            courses = await Course.findAll();
+        }
         res.status(200).json({ message: 'All courses retrieved successfully', courses });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving courses', error: error.message });
