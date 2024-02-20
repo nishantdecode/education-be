@@ -23,7 +23,17 @@ const create = async (req, res) => {
 const importCollegeData = async (req, res) => {
   try {
     // const college = await createCollege(req.body);
-    const colleges = [...data1,...data2,...data3,...data4,...data5,...data6,...data7,...data8,...data9];
+    const colleges = [
+      ...data1,
+      ...data2,
+      ...data3,
+      ...data4,
+      ...data5,
+      ...data6,
+      ...data7,
+      ...data8,
+      ...data9,
+    ];
     // const result = [];
     for (let college of colleges) {
       let rating = college.rating;
@@ -40,8 +50,8 @@ const importCollegeData = async (req, res) => {
         course_data: college.course_info,
         url: college.url,
         location: college.location,
-        rating:rating,
-        review:review,
+        rating: rating,
+        review: review,
         infrastructure: college.infrastructure,
         specialization: college.specialization,
         admission: college.admission,
@@ -58,7 +68,23 @@ const importCollegeData = async (req, res) => {
 };
 const getAllColleges = async (req, res) => {
   try {
-    const colleges = await College.findAll();
+    let { page, show } = req.query;
+    if (page) {
+      page = parseInt(page);
+    }
+    if (show) {
+      show = parseInt(show);
+    }
+    let colleges;
+    if (page && show) {
+      colleges = await College.findAll({
+        offset: page * show,
+        limit: show,
+      });
+    } else {
+      colleges = await College.findAll();
+    }
+
     res
       .status(200)
       .json({ message: "All colleges retrieved successfully", colleges });

@@ -13,7 +13,22 @@ const create = async (req, res) => {
 // Get all loans
 const getAllLoans = async (req, res) => {
     try {
-        const loans = await Loan.findAll();
+        let { page, show } = req.query;
+    if (page) {
+      page = parseInt(page);
+    }
+    if (show) {
+      show = parseInt(show);
+    }
+    let loans;
+    if (page && show) {
+        loans = await Loan.findAll({
+            offset: page * show,
+            limit: show,
+        });
+    } else {
+        loans = await Loan.findAll();
+    }
         res.status(200).json({ message: 'All loans retrieved successfully', loans });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving loans', error: error.message });

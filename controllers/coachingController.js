@@ -13,7 +13,22 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
     try {
-        const coachings = await Coaching.findAll();
+        let { page, show } = req.query;
+        if (page) {
+          page = parseInt(page);
+        }
+        if (show) {
+          show = parseInt(show);
+        }
+        let coachings;
+        if (page && show) {
+            coachings = await Coaching.findAll({
+                offset: page * show,
+                limit: show,
+            });
+        } else {
+            coachings = await Coaching.findAll();
+                }
         res.status(200).json({ message: 'All coachings retrieved successfully', coachings });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving coachings', error: error.message });
