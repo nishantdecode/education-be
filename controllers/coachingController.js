@@ -17,7 +17,7 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
   try {
-    let { page = 0, show = 10 } = req.query;
+    let { page = 1, show = 10 } = req.query;
     if (page) {
       page = parseInt(page);
     }
@@ -27,7 +27,7 @@ const getAllCoachings = async (req, res) => {
     let coachings;
     if (page && show) {
       coachings = await Coaching.findAll({
-        offset: page * show,
+        offset: (page-1) * show,
         limit: show,
       });
     } else {
@@ -38,6 +38,7 @@ const getAllCoachings = async (req, res) => {
       message: "All coachings retrieved successfully",
       coachings,
       currentPage: page,
+      totalPage:Math.ceil(totalCount/show),
       totalCount: totalCount,
     });
   } catch (error) {
