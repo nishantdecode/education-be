@@ -29,7 +29,11 @@ const getAllLoans = async (req, res) => {
     } else {
         loans = await Loan.findAll();
     }
-        res.status(200).json({ message: 'All loans retrieved successfully', loans });
+    const totalCount = await Loan.count();
+
+        res.status(200).json({ message: 'All loans retrieved successfully', loans,currentPage: page,
+        totalPage: Math.ceil(totalCount / show),
+        totalCount: totalCount });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving loans', error: error.message });
     }

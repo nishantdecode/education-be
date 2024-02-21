@@ -84,10 +84,16 @@ const getAllColleges = async (req, res) => {
     } else {
       colleges = await College.findAll();
     }
-
+    const totalCount = await College.count();
     res
       .status(200)
-      .json({ message: "All colleges retrieved successfully", colleges });
+      .json({ message: "All colleges retrieved successfully", 
+      colleges,
+      currentPage: page,
+      totalPage:Math.ceil(totalCount/show),
+      totalCount: totalCount,
+    
+    });
   } catch (error) {
     res
       .status(500)

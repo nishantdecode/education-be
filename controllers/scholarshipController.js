@@ -33,11 +33,16 @@ const getAllScholarships = async (req, res) => {
     } else {
       scholarships = await Scholarship.findAll();
     }
+    const totalCount = await Scholarship.count();
+
     res
       .status(200)
       .json({
         message: "All scholarships retrieved successfully",
         scholarships,
+        currentPage: page,
+        totalPage:Math.ceil(totalCount/show),
+        totalCount: totalCount,
       });
   } catch (error) {
     res
