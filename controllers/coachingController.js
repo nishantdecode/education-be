@@ -13,7 +13,7 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
     try {
-        let { page, show } = req.query;
+        let { page = 0, show = 10 } = req.query;
         if (page) {
           page = parseInt(page);
         }
@@ -29,7 +29,14 @@ const getAllCoachings = async (req, res) => {
         } else {
             coachings = await Coaching.findAll();
                 }
-        res.status(200).json({ message: 'All coachings retrieved successfully', coachings });
+        const totalCount = Coaching.count();
+        res.status(200).json({ 
+            message: 'All coachings retrieved successfully', 
+            coachings, 
+            currentPage: page,
+            totalPages: Math.ceil(totalCount / show),
+            totalCount: totalCount
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving coachings', error: error.message });
     }

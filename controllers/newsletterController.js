@@ -1,3 +1,4 @@
+const { sendMail } = require('../helper/EmailViaBrevo.helper');
 const sendEmail = require('../middlewares/sendMail');
 const { Newsletter } = require('../models/newsletter');
 const { submitForm } = require('../models/newsletter');
@@ -9,7 +10,9 @@ const apply = async (req, res) => {
         const submission = await submitForm({
             email
         });
-        const response = sendEmail(email, "Subscribed", "Dear User, You have successfully subscribed for Edmertion newsletter. You will get regular updates in your inbox.");
+        
+        sendMail(email,"Subscribed", "Dear User, You have successfully subscribed for Edmertion newsletter. You will get regular updates in your inbox.")
+        // const response = sendEmail(email, "Subscribed", "Dear User, You have successfully subscribed for Edmertion newsletter. You will get regular updates in your inbox.");
 
         res.status(201).json({ message: 'Form submitted successfully' });
     } catch (error) {
