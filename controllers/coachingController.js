@@ -29,13 +29,12 @@ const getAllCoachings = async (req, res) => {
         } else {
             coachings = await Coaching.findAll();
                 }
-        const totalCount = Coaching.count();
+        const totalCount = Coaching.findAll();
         res.status(200).json({ 
             message: 'All coachings retrieved successfully', 
             coachings, 
             currentPage: page,
-            totalPages: Math.ceil(totalCount / show),
-            totalCount: totalCount
+            totalCount: totalCount.length()
         });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving coachings', error: error.message });
