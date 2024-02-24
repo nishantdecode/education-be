@@ -26,7 +26,7 @@ const getAllLoans = async (req, res) => {
     if(search){
       filters.where.data.name ={
         [Op.contains]: {
-          [Op.regexp]: search // Apply the regex pattern to search
+          [Op.regexp]: new RegExp(search, 'i') // Apply the regex pattern to search
         }
       }
     }
