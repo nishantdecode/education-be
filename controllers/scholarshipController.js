@@ -1,4 +1,5 @@
 const { Scholarship, createScholarship } = require("../models/scholarship");
+const { Op } = require("sequelize"); // Import Sequelize's Op
 
 // Create a scholarship
 const create = async (req, res) => {
