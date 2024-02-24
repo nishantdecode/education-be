@@ -17,7 +17,55 @@ const create = async (req, res) => {
 // Get all scholarships
 const getAllScholarships = async (req, res) => {
   try {
-    let { page, show } = req.query;
+    let { page, show, search } = req.query;
+    let { minAmount, maxAmount, type, offeredBy,inTakeYear,minDeadLine,maxDeadLine } = req.body;
+    let filters = {
+      where: {
+        data: {},
+      },
+    };
+    if(search){
+      filters.where.data.name ={
+        [Op.iLike]: `%${search}%` 
+      }
+    }
+
+    if (minAmount) {
+      filters.where.data.amount = {
+        [Op.gt]: minAmount,
+      };
+    }
+    if (maxAmount) {
+      if (filters.where.data.amount) {
+        filters.where.data.amount[Op.lt] = maxAmount;
+      } else {
+        filters.where.data.amount = {
+          [Op.lt]: maxAmount,
+        };
+      }
+    }
+    if(inTakeYear){
+      filters.where.data.forYear = inTakeYear
+    }
+    if(offeredBy){
+      filters.where.data.type = offeredBy
+    } 
+    if(minDeadLine){
+      filters.where.data.importantDates["submission Date"] = {
+        [Op.gte]:minDeadLine
+      }
+    } 
+    if (maxDeadLine) {
+      if (filters.where.data.importantDates["submission Date"]) {
+        filters.where.data.importantDates["submission Date"] = {
+          [Op.lte]:maxDeadLine
+        }
+      } else {
+        filters.where.data.importantDates["submission Date"] = {
+          [Op.lte]:maxDeadLine
+        };
+      }
+    }
     if (page) {
       page = parseInt(page);
     }
