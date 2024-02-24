@@ -25,7 +25,7 @@ const getAllLoans = async (req, res) => {
     };
     if(search){
       filters.where.data.name ={
-        [Op.like]: `%${search}%` 
+        [Op.iLike]: `%${search}%` 
       }
     }
     if (minLoan) {
