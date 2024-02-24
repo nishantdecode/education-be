@@ -223,17 +223,53 @@ const importCourseData = async (req, res) => {
 const getAllCourses = async (req, res) => {
   try {
     let { page, show,search } = req.query;
-    let {languages} = req.body;
+    let {languages,minFees,maxFees,modes,platforms} = req.body;
     const filters = {
       where: {
+        [Op.and]:[]
       },
     }
+    if(modes && modes.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: modes.map(md => ({
+          'mode': {
+            [Op.iLike]: `%${md}%`
+          } // Match any date in the array
+        }))
+      })
+    }
+    if(platforms && platforms.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: platforms.map(p => ({
+          'platform': {
+            [Op.iLike]: `%${p}%`
+          } // Match any date in the array
+        }))
+      })
+    }
     if(languages && languages.length>0){
-      filters.where[Op.or]= languages.map(lng => ({
-        'language': {
-          [Op.iLike]: `%${lng}%`
-        } // Match any date in the array
-      }))
+      filters.where[Op.and].push({
+        [Op.or]: languages.map(lng => ({
+          'language': {
+            [Op.iLike]: `%${lng}%`
+          } // Match any date in the array
+        }))
+      })
+    }
+
+    if (minFees) {
+      filters.where.price = {
+        [Op.gt]: minFees,
+      };
+    }
+    if (maxFees) {
+      if (filters.where.price) {
+        filters.where.price[Op.lt] = maxFees;
+      } else {
+        filters.where.price = {
+          [Op.lt]: maxFees,
+        };
+      }
     }
     if (page) {
       page = parseInt(page);
