@@ -244,13 +244,14 @@ const getAllCourses = async (req, res) => {
     let courses;
     if (page && show) {
       courses = await Course.findAll({
+        ...filters,
         offset: (page - 1) * show,
         limit: show,
       });
     } else {
-      courses = await Course.findAll();
+      courses = await Course.findAll({...filters});
     }
-    const totalCount = await Course.count();
+    const totalCount = await Course.count({...filters});
 
     res.status(200).json({
       message: "All courses retrieved successfully",
