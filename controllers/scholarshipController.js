@@ -22,9 +22,9 @@ const getAllScholarships = async (req, res) => {
     let { minAmount, maxAmount, type, offeredBy,inTakeYear,minDeadLine,maxDeadLine } = req.body;
     let filters = {
       where: {
-        [Op.and]:[]
+        [Op.and]:[],
+        data:{}
       },
-      data:{}
     };
     if(search){
       filters.where.data.name ={
@@ -38,7 +38,7 @@ const getAllScholarships = async (req, res) => {
       };
     }
     if (maxAmount) {
-      if (filters.where.data.amount) {
+      if (filters.where.data?.amount) {
         filters.where.data.amount[Op.lt] = maxAmount;
       } else {
         filters.where.data.amount = {
