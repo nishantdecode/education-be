@@ -6,7 +6,7 @@ const scholarshipController = require('../controllers/scholarshipController');
 router.post('/', scholarshipController.create);
 
 // Get all scholarships
-router.get('/', scholarshipController.getAllScholarships);
+router.post('/all', scholarshipController.getAllScholarships);
 
 // Get a scholarship by ID
 router.get('/:id', scholarshipController.getScholarshipById);
