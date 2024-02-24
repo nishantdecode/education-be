@@ -25,9 +25,7 @@ const getAllLoans = async (req, res) => {
     };
     if(search){
       filters.where.data.name ={
-        [Op.contains]: {
-          [Op.regexp]: new RegExp(search, 'i') // Apply the regex pattern to search
-        }
+        [Op.like]: `%${search}%` 
       }
     }
     if (minLoan) {
