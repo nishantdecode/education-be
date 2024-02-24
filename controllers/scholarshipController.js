@@ -50,7 +50,7 @@ const getAllScholarships = async (req, res) => {
     if(inTakeYear && inTakeYear.length>0){
       filters.where[Op.and].push({
         [Op.or]: inTakeYear.map(year => ({
-          'forYear': {
+          'data.forYear': {
             [Op.iLike]: `%${year}%`
           } // Match any date in the array
         }))
@@ -59,7 +59,7 @@ const getAllScholarships = async (req, res) => {
     if(offeredBy && offeredBy.length>0){
       filters.where[Op.and].push({
         [Op.or]: offeredBy.map(offer => ({
-          'type': {
+          'data.type': {
             [Op.iLike]: `%${offer}%`
           } // Match any date in the array
         }))
