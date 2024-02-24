@@ -1,4 +1,5 @@
 const { Loan, createLoan } = require("../models/loan");
+const { Op } = require('sequelize'); // Import Sequelize's Op
 
 // Create a loan
 const create = async (req, res) => {
