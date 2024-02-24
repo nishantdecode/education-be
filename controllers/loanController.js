@@ -74,9 +74,9 @@ const getAllLoans = async (req, res) => {
         limit: show,
       });
     } else {
-      loans = await Loan.findAll();
+      loans = await Loan.findAll({...filters});
     }
-    const totalCount = await Loan.count();
+    const totalCount = await Loan.count({...filters});
 
     res.status(200).json({
       message: "All loans retrieved successfully",

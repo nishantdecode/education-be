@@ -76,13 +76,14 @@ const getAllScholarships = async (req, res) => {
     let scholarships;
     if (page && show) {
       scholarships = await Scholarship.findAll({
+        ...filters,
         offset: (page - 1) * show,
         limit: show,
       });
     } else {
-      scholarships = await Scholarship.findAll();
+      scholarships = await Scholarship.findAll({...filters});
     }
-    const totalCount = await Scholarship.count();
+    const totalCount = await Scholarship.count({...filters});
 
     res
       .status(200)
