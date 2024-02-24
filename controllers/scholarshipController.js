@@ -27,7 +27,7 @@ const getAllScholarships = async (req, res) => {
     let scholarships;
     if (page && show) {
       scholarships = await Scholarship.findAll({
-        offset: page * show,
+        offset: (page - 1) * show,
         limit: show,
       });
     } else {

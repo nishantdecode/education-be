@@ -78,7 +78,7 @@ const getAllColleges = async (req, res) => {
     let colleges;
     if (page && show) {
       colleges = await College.findAll({
-        offset: page * show,
+        offset: (page - 1) * show,
         limit: show,
       });
     } else {

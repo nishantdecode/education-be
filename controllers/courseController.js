@@ -229,21 +229,22 @@ const getAllCourses = async (req, res) => {
     }
     let courses;
     if (page && show) {
-      courses = await Course.findAll({ offset: page * show, limit: show });
+      courses = await Course.findAll({
+        offset: (page - 1) * show,
+        limit: show,
+      });
     } else {
       courses = await Course.findAll();
     }
     const totalCount = await Course.count();
 
-    res
-      .status(200)
-      .json({
-        message: "All courses retrieved successfully",
-        courses,
-        currentPage: page,
-        totalPage: Math.ceil(totalCount / show),
-        totalCount: totalCount,
-      });
+    res.status(200).json({
+      message: "All courses retrieved successfully",
+      courses,
+      currentPage: page,
+      totalPage: Math.ceil(totalCount / show),
+      totalCount: totalCount,
+    });
   } catch (error) {
     res
       .status(500)
