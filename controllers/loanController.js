@@ -16,13 +16,20 @@ const create = async (req, res) => {
 // Get all loans
 const getAllLoans = async (req, res) => {
   try {
-    let { page, show } = req.query;
+    let { page, show,search } = req.query;
     let { minRate, maxRate, minLoan, maxLoan } = req.body;
     let filters = {
       where: {
         data: {},
       },
     };
+    if(search){
+      filters.where.data.name ={
+        [Op.contains]: {
+          [Op.regexp]: search // Apply the regex pattern to search
+        }
+      }
+    }
     if (minLoan) {
       filters.where.data.amount = {
         [Op.gt]: minLoan,
