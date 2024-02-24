@@ -2,6 +2,8 @@
 const { Course, createCourse } = require("../models/course");
 const excelToJson = require("convert-excel-to-json");
 const fs = require("fs");
+const { Op } = require("sequelize"); // Import Sequelize's Op
+
 const create = async (req, res) => {
   try {
     const course = await createCourse(req.body);
