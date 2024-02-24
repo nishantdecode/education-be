@@ -52,18 +52,20 @@ const getAllScholarships = async (req, res) => {
       filters.where.data.type = offeredBy
     } 
     if(minDeadLine){
-      filters.where.data.importantDates["submission Date"] = {
-        [Op.gte]:minDeadLine
+      filters.where.data.importantDates = {
+        ["submission Date"]:{
+          [Op.gte]:new Date(minDeadLine)
+        }
       }
     } 
     if (maxDeadLine) {
-      if (filters.where.data.importantDates["submission Date"]) {
-        filters.where.data.importantDates["submission Date"] = {
-          [Op.lte]:maxDeadLine
-        }
+      if (filters.where.data.importantDates?.["submission Date"]) {
+        filters.where.data.importantDates["submission Date"][Op.lte]=new Date(maxDeadLine)
       } else {
-        filters.where.data.importantDates["submission Date"] = {
-          [Op.lte]:maxDeadLine
+        filters.where.data.importantDates = {
+          ["submission Date"]:{
+            [Op.lte]:new Date(maxDeadLine)
+          }
         };
       }
     }
