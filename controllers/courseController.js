@@ -220,7 +220,19 @@ const importCourseData = async (req, res) => {
 };
 const getAllCourses = async (req, res) => {
   try {
-    let { page, show } = req.query;
+    let { page, show,search } = req.query;
+    let {languages} = req.body;
+    const filters = {
+      where: {
+      },
+    }
+    if(languages && languages.length>0){
+      filters.where[Op.or]= languages.map(lng => ({
+        'language': {
+          [Op.iLike]: `%${lng}%`
+        } // Match any date in the array
+      }))
+    }
     if (page) {
       page = parseInt(page);
     }
