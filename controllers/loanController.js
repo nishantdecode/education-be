@@ -1,5 +1,5 @@
 const { Loan, createLoan } = require("../models/loan");
-const { Op } = require('sequelize'); // Import Sequelize's Op
+const { Op } = require("sequelize"); // Import Sequelize's Op
 
 // Create a loan
 const create = async (req, res) => {
@@ -17,16 +17,43 @@ const create = async (req, res) => {
 const getAllLoans = async (req, res) => {
   try {
     let { page, show } = req.query;
-    let { minRate,maxRate, minLoan, maxLoan } = req.body;
+    let { minRate, maxRate, minLoan, maxLoan } = req.body;
     let filters = {
       where: {
-        data: {}
+        data: {},
       },
     };
-    if (minRate) {
+    if (minLoan) {
+      filters.where.data.amount = {
+        [Op.gt]: minLoan,
+      };
+    }
+    if (maxLoan) {
+      if (filters.where.data.amount) {
+        filters.where.data.amount[Op.lt] = maxLoan;
+      } else {
         filters.where.data.amount = {
-          [Op.gt]:minRate
-        }
+          [Op.lt]: maxLoan,
+        };
+      }
+    }
+    if (minRate) {
+      filters.where.data.interestRates = {
+        male: {
+          [Op.gt]: minRate,
+        },
+      };
+    }
+    if (maxRate) {
+      if (filters.where.data.interestRates?.male) {
+        filters.where.data.interestRates.male[Op.lt] = maxRate;
+      } else {
+        filters.where.data.interestRates = {
+          male: {
+            [Op.lt]: maxRate,
+          },
+        };
+      }
     }
     if (page) {
       page = parseInt(page);
@@ -46,15 +73,13 @@ const getAllLoans = async (req, res) => {
     }
     const totalCount = await Loan.count();
 
-    res
-      .status(200)
-      .json({
-        message: "All loans retrieved successfully",
-        loans,
-        currentPage: page,
-        totalPage: Math.ceil(totalCount / show),
-        totalCount: totalCount,
-      });
+    res.status(200).json({
+      message: "All loans retrieved successfully",
+      loans,
+      currentPage: page,
+      totalPage: Math.ceil(totalCount / show),
+      totalCount: totalCount,
+    });
   } catch (error) {
     res
       .status(500)
