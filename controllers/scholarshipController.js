@@ -22,8 +22,9 @@ const getAllScholarships = async (req, res) => {
     let { minAmount, maxAmount, type, offeredBy,inTakeYear,minDeadLine,maxDeadLine } = req.body;
     let filters = {
       where: {
-        data: {},
+        [Op.and]:[]
       },
+      data:{}
     };
     if(search){
       filters.where.data.name ={
@@ -45,12 +46,25 @@ const getAllScholarships = async (req, res) => {
         };
       }
     }
-    if(inTakeYear){
-      filters.where.data.forYear = inTakeYear
+
+    if(inTakeYear && inTakeYear.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: inTakeYear.map(year => ({
+          'forYear': {
+            [Op.iLike]: `%${year}%`
+          } // Match any date in the array
+        }))
+      })
     }
-    if(offeredBy){
-      filters.where.data.type = offeredBy
-    } 
+    if(offeredBy && offeredBy.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: offeredBy.map(offer => ({
+          'type': {
+            [Op.iLike]: `%${offer}%`
+          } // Match any date in the array
+        }))
+      })
+    }
     if(minDeadLine){
       filters.where.data.importantDates = {
         ["submission Date"]:{

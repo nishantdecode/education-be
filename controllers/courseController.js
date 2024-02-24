@@ -229,6 +229,12 @@ const getAllCourses = async (req, res) => {
         [Op.and]:[]
       },
     }
+
+    if(search){
+      filters.where.title ={
+        [Op.iLike]: `%${search}%` 
+      }
+    }
     if(modes && modes.length>0){
       filters.where[Op.and].push({
         [Op.or]: modes.map(md => ({
