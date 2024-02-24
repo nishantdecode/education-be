@@ -6,7 +6,7 @@ const loanController = require('../controllers/loanController');
 router.post('/', loanController.create);
 
 // Get all loans
-router.post('/', loanController.getAllLoans);
+router.post('/all', loanController.getAllLoans);
 
 // Get a loan by ID
 router.get('/:id', loanController.getLoanById);
