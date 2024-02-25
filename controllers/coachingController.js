@@ -90,13 +90,14 @@ if (minSeats) {
     let coachings;
     if (page && show) {
       coachings = await Coaching.findAll({
+        ...filters,
         offset: (page-1) * show,
         limit: show,
       });
     } else {
-      coachings = await Coaching.findAll();
+      coachings = await Coaching.findAll({...filters});
     }
-    const totalCount = await Coaching.count();
+    const totalCount = await Coaching.count({...filters});
     res.status(200).json({
       message: "All coachings retrieved successfully",
       coachings,
