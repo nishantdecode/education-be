@@ -1,5 +1,5 @@
 const { Coaching, createCoaching } = require("../models/coaching");
-const {Op} = require("sequelize")
+const { Op } = require("sequelize");
 // Create a coaching
 const create = async (req, res) => {
   try {
@@ -18,77 +18,85 @@ const create = async (req, res) => {
 const getAllCoachings = async (req, res) => {
   try {
     let { page = 1, show = 10, search } = req.query;
-    const {locations,specializations,minFees,maxFees,ratings,minSeats,maxSeats} = req.body
+    const {
+      locations,
+      specializations,
+      minFees,
+      maxFees,
+      ratings,
+      minSeats,
+      maxSeats,
+    } = req.body;
     let filters = {
-      where:{
-        [Op.and]:[],
-        data:{}
-      }
-    }
-    if(search){
-      filters.where.data.name ={
-        [Op.iLike]: `%${search}%` 
-      }
+      where: {
+        [Op.and]: [],
+        data: {},
+      },
+    };
+    if (search) {
+      filters.where.data.name = {
+        [Op.iLike]: `%${search}%`,
+      };
     }
 
     if (minFees) {
       filters.where.data.fees = {
-        min:{
-          [Op.gt]: minFees
-        }
+        min: {
+          [Op.gt]: minFees,
+        },
       };
     }
     if (maxFees) {
       if (filters.where.data?.fees) {
-        filters.where.data.fees.max = {[Op.lt]: maxFees};
+        filters.where.data.fees.max = { [Op.lt]: maxFees };
       } else {
         filters.where.data.fees = {
-          max:{
-            [Op.lt]: maxFees
-          }
+          max: {
+            [Op.lt]: maxFees,
+          },
         };
       }
     }
-if (minSeats) {
+    if (minSeats) {
       filters.where.data.seats = {
-          [Op.gt]: minSeats
+        [Op.gt]: minSeats,
       };
     }
     if (maxSeats) {
       if (filters.where.data?.seats) {
-        filters.where.data.seats[Op.gte] = maxSeats;
+        filters.where.data.seats[Op.lte] = maxSeats;
       } else {
         filters.where.data.seats = {
-            [Op.lt]: maxSeats
+          [Op.lt]: maxSeats,
         };
       }
     }
-    if(specializations && specializations.length>0){
+    if (specializations && specializations.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: specializations.map(s => ({
-          'data.specialization': {
-            [Op.iLike]: `%${s}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: specializations.map((s) => ({
+          "data.specialization": {
+            [Op.iLike]: `%${s}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-    if(ratings && ratings.length>0){
+    if (ratings && ratings.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: ratings.map(r => ({
-          'data.rating': {
-            [Op.iLike]: `%${r}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: ratings.map((r) => ({
+          "data.rating": {
+            [Op.iLike]: `%${r}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-     if(locations && locations.length>0){
+    if (locations && locations.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: locations.map(l => ({
-          'data.location': {
-            [Op.iLike]: `%${l}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: locations.map((l) => ({
+          "data.location": {
+            [Op.iLike]: `%${l}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
     if (page) {
       page = parseInt(page);
@@ -100,18 +108,18 @@ if (minSeats) {
     if (page && show) {
       coachings = await Coaching.findAll({
         ...filters,
-        offset: (page-1) * show,
+        offset: (page - 1) * show,
         limit: show,
       });
     } else {
-      coachings = await Coaching.findAll({...filters});
+      coachings = await Coaching.findAll({ ...filters });
     }
-    const totalCount = await Coaching.count({...filters});
+    const totalCount = await Coaching.count({ ...filters });
     res.status(200).json({
       message: "All coachings retrieved successfully",
       coachings,
       currentPage: page,
-      totalPage:Math.ceil(totalCount/show),
+      totalPage: Math.ceil(totalCount / show),
       totalCount: totalCount,
     });
   } catch (error) {
