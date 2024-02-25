@@ -1,5 +1,5 @@
 const { Coaching, createCoaching } = require("../models/coaching");
-
+const {Op} = require("sequelize")
 // Create a coaching
 const create = async (req, res) => {
   try {
@@ -17,7 +17,70 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
   try {
-    let { page = 1, show = 10 } = req.query;
+    let { page = 1, show = 10, search } = req.query;
+    const {specializations,minFees,maxFees,ratings,minSeats,maxSeats} = req.body
+    let filters = {
+      where:{
+        [Op.and]:[],
+        data:{}
+      }
+    }
+    if(search){
+      filters.where.data.name ={
+        [Op.iLike]: `%${search}%` 
+      }
+    }
+
+    if (minFees) {
+      filters.where.data.fees = {
+        min:{
+          [Op.gt]: minFees
+        }
+      };
+    }
+    if (maxFees) {
+      if (filters.where.data?.fees) {
+        filters.where.data.fees.max = {[Op.lt]: maxFees};
+      } else {
+        filters.where.data.fees = {
+          max:{
+            [Op.lt]: maxFees
+          }
+        };
+      }
+    }
+if (minSeats) {
+      filters.where.data.seats = {
+          [Op.gt]: minSeats
+      };
+    }
+    if (maxSeats) {
+      if (filters.where.data?.seats) {
+        filters.where.data.seats[Op.gte] = maxSeats;
+      } else {
+        filters.where.data = {
+            [Op.lt]: maxSeats
+        };
+      }
+    }
+    if(specializations && specializations.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: specializations.map(s => ({
+          'data.specialization': {
+            [Op.iLike]: `%${s}%`
+          } // Match any date in the array
+        }))
+      })
+    }
+    if(ratings && ratings.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: ratings.map(r => ({
+          'data.rating': {
+            [Op.iLike]: `%${r}%`
+          } // Match any date in the array
+        }))
+      })
+    }
     if (page) {
       page = parseInt(page);
     }
