@@ -44,6 +44,7 @@ const importCollegeData = async (req, res) => {
       if (review) {
         review = parseInt(review.split(" ")[0].trim().substr(1));
       }
+      console.log({course:college.course_info});
       // result.push();
       await createCollege({
         name: college.clgname,
@@ -137,6 +138,7 @@ const updateCollege = async (req, res) => {
       .json({ message: "Error updating college", error: error.message });
   }
 };
+
 
 const deleteCollege = async (req, res) => {
   const { id } = req.params;
