@@ -18,7 +18,7 @@ const create = async (req, res) => {
 const getAllCoachings = async (req, res) => {
   try {
     let { page = 1, show = 10, search } = req.query;
-    const {specializations,minFees,maxFees,ratings,minSeats,maxSeats} = req.body
+    const {locations,specializations,minFees,maxFees,ratings,minSeats,maxSeats} = req.body
     let filters = {
       where:{
         [Op.and]:[],
@@ -58,7 +58,7 @@ if (minSeats) {
       if (filters.where.data?.seats) {
         filters.where.data.seats[Op.gte] = maxSeats;
       } else {
-        filters.where.data = {
+        filters.where.data.seats = {
             [Op.lt]: maxSeats
         };
       }
@@ -77,6 +77,15 @@ if (minSeats) {
         [Op.or]: ratings.map(r => ({
           'data.rating': {
             [Op.iLike]: `%${r}%`
+          } // Match any date in the array
+        }))
+      })
+    }
+     if(locations && locations.length>0){
+      filters.where[Op.and].push({
+        [Op.or]: locations.map(l => ({
+          'data.location': {
+            [Op.iLike]: `%${l}%`
           } // Match any date in the array
         }))
       })
