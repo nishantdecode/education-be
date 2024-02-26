@@ -19,7 +19,7 @@ const create = async (req, res) => {
 const getAllScholarships = async (req, res) => {
   try {
     let { page, show, search } = req.query;
-    let { minAmount, maxAmount, type, offeredBy,inTakeYear,minDeadLine,maxDeadLine } = req.body;
+    let { minAmount, maxAmount, "scholarship type":type, "offered by":offeredBy,"intake year":inTakeYear,minDeadLine,maxDeadLine } = req.body;
     let filters = {
       where: {
         [Op.and]:[],
