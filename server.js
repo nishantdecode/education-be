@@ -52,7 +52,7 @@ sequelize
     console.log('Connected to PostgreSQL');
     // Start the server
     const server = http.createServer(app);
-    server.listen(port, "localhost", () => {
+    server.listen(port, () => {
       console.log(`Server running at http://localhost:${port}/`);
     });
   })
