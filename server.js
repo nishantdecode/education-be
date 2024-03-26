@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 
 // Add routes
 app.use('/api', routes);
-aoo.listen(port, () => {
+app.listen(port, () => {
       console.log(`Server running at http://localhost:${port}/`);
    });
 // Connect to PostgreSQL
