@@ -44,22 +44,20 @@ app.get('/', (req, res) => {
 
 // Add routes
 app.use('/api', routes);
-app.listen(port, () => {
+
+Connect to PostgreSQL
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connected to PostgreSQL');
+    // Start the server
+    const server = http.createServer(app);
+    server.listen(port, "localhost", () => {
       console.log(`Server running at http://localhost:${port}/`);
-   });
-// Connect to PostgreSQL
-// sequelize
-//   .authenticate()
-//   .then(() => {
-//     console.log('Connected to PostgreSQL');
-//     // Start the server
-//     const server = http.createServer(app);
-//     server.listen(port, "localhost", () => {
-//       console.log(`Server running at http://localhost:${port}/`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.error('Failed to connect to PostgreSQL:', err);
-//   });
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to connect to PostgreSQL:', err);
+  });
 
 
