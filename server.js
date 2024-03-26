@@ -37,6 +37,13 @@ app.use(fileUpload({
 
 // Parse incoming JSON
 app.use(express.json({ limit: '100mb' }));
+// Add a route for showing a message on the browser
+app.get('/', (req, res) => {
+  res.send(`Hello World!`);
+});
+
+// Add routes
+app.use('/api', routes);
 
 // Connect to PostgreSQL
 sequelize
@@ -53,10 +60,4 @@ sequelize
     console.error('Failed to connect to PostgreSQL:', err);
   });
 
-// Add a route for showing a message on the browser
-app.get('/', (req, res) => {
-  res.send(`Hello World!`);
-});
 
-// Add routes
-app.use('/api', routes);
