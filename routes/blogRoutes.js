@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const blogController = require('../controllers/blogController');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single('file');
 
 router.post('/blogs', blogController.createAdd);
 router.get('/blogs', blogController.getAllBlogs);

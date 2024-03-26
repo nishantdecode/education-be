@@ -1,11 +1,16 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 const advertisementController = require('../controllers/advertisementController');
+const storage = require("../middlewares/upload/uploadFile");
 
-router.post('/advertisements', advertisementController.createAdd);
-router.get('/advertisements', advertisementController.getAllAdvertisements);
-router.get('/advertisements/:id', advertisementController.getAdvertisementById);
-router.put('/advertisements/:id', advertisementController.updateAdvertisement);
-router.delete('/advertisements/:id', advertisementController.deleteAdvertisement);
+const upload = multer({ storage });
+
+// router.post('/post', upload.single('image'), advertisementController.createAdd);
+router.post('/', advertisementController.createAdd);
+router.get('/get', advertisementController.getAllAdvertisements);
+router.get('/:id', advertisementController.getAdvertisementById);
+router.put('/update/:id', advertisementController.updateAdvertisement);
+router.delete('/delete/:id', advertisementController.deleteAdvertisement);
 
 module.exports = router;
