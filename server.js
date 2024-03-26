@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 // Add routes
 app.use('/api', routes);
 
-Connect to PostgreSQL
+// Connect to PostgreSQL
 sequelize
   .authenticate()
   .then(() => {
