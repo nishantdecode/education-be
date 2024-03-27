@@ -14,7 +14,8 @@ const {
     approveVerificationTag,
     rejectVerificationTag,
     requestVerificationTag,
-    getUserTagsAndBlogs
+    getUserTagsAndBlogs,
+    getAllUsers
 } = require('../controllers/userController');
 
 // Send OTP route
@@ -35,7 +36,7 @@ router.post('/login/email', loginWithEmailAndOtp);
 router.put('/update-user', updateUserDetails); // Requires authentication
 
 router.get('/user/:userId', getUserDataByUserId); // Retrieve user data by userID
-
+router.get('/', getAllUsers);
 router.get('/user/:userId/info', getUserDataWithInfoPercentage);
 
 router.get('/count', getUsersCountByCountry); // Retrieve user count

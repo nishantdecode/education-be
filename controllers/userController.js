@@ -215,6 +215,16 @@ const updateUserDetails = async (req, res) => {
     }
 };
 
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.status(200).json({ message: 'All users retrieved successfully', users });
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+        res.status(500).json({ message: 'Error retrieving users', error: error.message });
+    }
+};
+
 //user with blogs data if no blogs when return empty array []
 const getUserDataByUserId = async (req, res) => {
     const { userId } = req.params;
@@ -391,5 +401,6 @@ module.exports = {
     requestVerificationTag,
     approveVerificationTag,
     rejectVerificationTag,
-    getUserTagsAndBlogs
+    getUserTagsAndBlogs,
+    getAllUsers
 };
