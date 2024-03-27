@@ -1,17 +1,19 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require('express');
 const app = express();
 const http = require('http');
 const sequelize = require('./config/db'); // Import the sequelize instance
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_key: process.env.CLOUDINARY_APIKEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-require('dotenv').config();
 
 const corsMiddleware = require('./middlewares/corsMiddleware');
 const helmetMiddleware = require('./middlewares/helmetMiddleware');
@@ -30,12 +32,13 @@ app.use(helmetMiddleware);
 app.use(limiterMiddleware);
 app.use(sanitizeMiddleware);
 app.use(logMiddleware);
-app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: '/tmp/'
-}));
+// app.use(fileUpload({
+//   useTempFiles: true,
+//   tempFileDir: '/tmp/'
+// }));
 
 // Parse incoming JSON
+
 app.use(express.json({ limit: '100mb' }));
 // Add a route for showing a message on the browser
 app.get('/', (req, res) => {
@@ -45,7 +48,6 @@ app.get('/', (req, res) => {
 // Add routes
 app.use('/api', routes);
 
-// Connect to PostgreSQL
 sequelize
   .authenticate()
   .then(() => {

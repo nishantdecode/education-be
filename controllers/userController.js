@@ -215,8 +215,9 @@ const updateUserDetails = async (req, res) => {
     }
 };
 
+//user with blogs data if no blogs when return empty array []
 const getUserDataByUserId = async (req, res) => {
-    const { userId } = req.params; // Assuming the user ID is provided as a parameter
+    const { userId } = req.params;
 
     try {
         const user = await User.findOne({ where: { userId } });
@@ -225,11 +226,17 @@ const getUserDataByUserId = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ message: 'User data retrieved successfully', user });
+        let blogs;
+        if (user) {
+            blogs = await Blog.findAll({ where: { userId } });
+        }
+
+        res.status(200).json({ message: 'User data retrieved successfully', user, blogs });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving user data', error: error.message });
     }
 };
+
 
 const getUserInfoPercentage = (user) => {
     const totalFields = 8; // Total number of user information fields (excluding userId)

@@ -8,13 +8,13 @@ const { User } = require('../models/user');
 
 const createAdd = async (req, res) => {
     const { userId, title, owner, description, ownerUrl, tags } = req.body;
-    console.log("Uploaded Image File:", req.files.image);
+    console.log("Uploaded Image File:", req?.file?.image);
 
-    if (!req.files || !req.files.image) {
+    if (!req.file || !req.file.image) {
         return res.status(400).json({ message: 'No image file provided' });
     }
 
-    const imageFile = req.files.image;
+    const imageFile = req.file.image;
     console.log("Image File Path:", imageFile.tempFilePath);
 
     if (!imageFile.tempFilePath) {
@@ -60,9 +60,9 @@ const createAdd = async (req, res) => {
 const getAllBlogs = async (req, res) => {
     try {
         const blogs = await Blog.findAll({
-            include:  [{
+            include: [{
                 model: User,
-                attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
+                attributes: ['userId', 'firstName', 'email', 'mobile', 'lastName', 'profileImageUrl'],
             }],
             order: [['likes', 'DESC']], // Order by likes in descending order
         });
