@@ -24,7 +24,7 @@ const logMiddleware = require('./middlewares/logMiddleware');
 const routes = require('./routes');
 
 const hostname = process.env.HOSTNAME;
-const port = process.env.PORT || 3000;
+const port = 3001 || 3000;
 
 // Use middlewares
 app.use(corsMiddleware);

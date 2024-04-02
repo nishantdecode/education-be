@@ -43,7 +43,7 @@ const verifyOtp = async (req, res) => {
 
 
 const signup = async (req, res) => {
-    const { email, mobile, firstName, lastName, dateOfBirth, country, state, city } = req.body;
+    const { role, email, mobile, firstName, lastName, dateOfBirth, country, state, city } = req.body;
 
     // Calculate age from date of birth (assuming it's provided during signup)
     const age = calculateAge(dateOfBirth).toString();
@@ -70,6 +70,7 @@ const signup = async (req, res) => {
 
         // Save user data to the database
         const user = await createUser({
+            role,
             userId,
             email,
             mobile,
