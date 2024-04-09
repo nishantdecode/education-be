@@ -17,7 +17,7 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
   try {
-    let { page = 1, show = 10, search } = req.query;
+    let { page, show, search } = req.query;
     const {
       locations,
       specializations,
