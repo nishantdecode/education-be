@@ -68,13 +68,8 @@ const importCollegeData = async (req, res) => {
       .json({ message: "Error creating college", error: error.message });
   }
 };
-let filters = {
-  where: {
-    [Op.and]: [],
-    data: {},
-  },
-};
 const getAllColleges = async (req, res) => {
+
   try {
     let { page, show, } = req.query;
     let {rating} = req.body
@@ -84,6 +79,12 @@ const getAllColleges = async (req, res) => {
     if (show) {
       show = parseInt(show);
     }
+    let filters = {
+      where: {
+        [Op.and]: [],
+        data: {},
+      },
+    };
     let colleges;
     // let filter = {};
     
