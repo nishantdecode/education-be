@@ -9,6 +9,7 @@ const data6 = require("../data/college_data_final6.json");
 const data7 = require("../data/college_data_final7.json");
 const data8 = require("../data/college_data_final8.json");
 const data9 = require("../data/college_data_final9.json");
+const { Op } = require("sequelize");
 
 const create = async (req, res) => {
   try {
@@ -67,9 +68,16 @@ const importCollegeData = async (req, res) => {
       .json({ message: "Error creating college", error: error.message });
   }
 };
+let filters = {
+  where: {
+    [Op.and]: [],
+    data: {},
+  },
+};
 const getAllColleges = async (req, res) => {
   try {
-    let { page, show } = req.query;
+    let { page, show, } = req.query;
+    let {rating} = req.body
     if (page) {
       page = parseInt(page);
     }
@@ -77,6 +85,18 @@ const getAllColleges = async (req, res) => {
       show = parseInt(show);
     }
     let colleges;
+    // let filter = {};
+    
+      // Parse ratings string to an array of floats and then map them to integers
+      if (rating && rating.length > 0) {
+        filters.where[Op.and].push({
+          [Op.or]: rating.map((r) => ({
+            "data.rating": {
+              [Op.iLike]: `%${r}%`,
+            }, // Match any date in the array
+          })),
+        });
+      }
     if (page && show) {
       colleges = await College.findAll({
         offset: (page - 1) * show,
