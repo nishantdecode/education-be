@@ -70,6 +70,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 'none',
   },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    allowNull: false,
+    defaultValue: 'user',
+  },
   usedTags: {
     type: DataTypes.STRING,
     allowNull: true,

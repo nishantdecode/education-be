@@ -43,7 +43,7 @@ const verifyOtp = async (req, res) => {
 
 
 const signup = async (req, res) => {
-    const { email, mobile, firstName, lastName, dateOfBirth, country, state, city } = req.body;
+    const { role, email, mobile, firstName, lastName, dateOfBirth, country, state, city } = req.body;
 
     // Calculate age from date of birth (assuming it's provided during signup)
     const age = calculateAge(dateOfBirth).toString();
@@ -70,6 +70,7 @@ const signup = async (req, res) => {
 
         // Save user data to the database
         const user = await createUser({
+            role,
             userId,
             email,
             mobile,
@@ -212,6 +213,16 @@ const updateUserDetails = async (req, res) => {
         res.status(200).json({ message: 'User details updated successfully', user });
     } catch (error) {
         res.status(500).json({ message: 'Error updating user details', error: error.message });
+    }
+};
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.status(200).json({ message: 'All users retrieved successfully', users });
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+        res.status(500).json({ message: 'Error retrieving users', error: error.message });
     }
 };
 
@@ -391,5 +402,6 @@ module.exports = {
     requestVerificationTag,
     approveVerificationTag,
     rejectVerificationTag,
-    getUserTagsAndBlogs
+    getUserTagsAndBlogs,
+    getAllUsers
 };

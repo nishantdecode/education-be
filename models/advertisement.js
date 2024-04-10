@@ -18,6 +18,7 @@ const Advertisement = sequelize.define('Advertisement', {
   },
   imageUrl: {
     type: DataTypes.STRING,
+    defaultValue: 'https://promova.com/content/advertising_terminology_0d63aea503.png',
   },
 }, {
   tableName: 'Advertisements',
