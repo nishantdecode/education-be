@@ -20,7 +20,7 @@ router.post("/single", upload, async (req, res) => {
     }
 
     // Upload file to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.buffer, { folder: "edmertion" });
+    const result = await cloudinary.uploader.upload(req.file.buffer, { resource_type: 'raw',folder: "edmertion" });
   
     // Send the file URL in the response
     res.json({ fileUrl: result.url });
