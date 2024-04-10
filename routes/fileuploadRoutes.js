@@ -12,15 +12,17 @@ cloudinary.config({
 // Set up multer storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single('file');
+const { Readable } = require('stream');
 
 router.post("/single", upload, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
+    const stream = Readable.from(req.file.buffer);
 
     // Upload file to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.buffer, { resource_type: 'raw' });
+    const result = await cloudinary.uploader.upload(stream, { resource_type: 'raw' });
   
     // Send the file URL in the response
     res.json({ fileUrl: result.url });
