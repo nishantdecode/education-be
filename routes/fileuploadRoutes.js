@@ -30,7 +30,7 @@ router.post("/single", upload, async (req, res) => {
     const cldRes = await handleUpload(dataURI);
   
     // Send the file URL in the response
-    res.json({ fileUrl: cldRes });
+    res.json({ fileUrl: cldRes.url });
   } catch (error) {
     console.error('Error uploading file to Cloudinary:', error);
     res.status(500).json({ message: 'Error uploading file' });
