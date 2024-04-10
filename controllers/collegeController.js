@@ -68,58 +68,57 @@ const importCollegeData = async (req, res) => {
       .json({ message: "Error creating college", error: error.message });
   }
 };
-const getAllColleges = async (req, res) => {
+// let filters = {
+//   where: {
+//     [Op.and]: [],
+//     data: {},
+//   },
+// };
 
+const getAllColleges = async (req, res) => {
   try {
-    let { page, show, } = req.query;
-    let {rating} = req.body
+    let { page, show } = req.query;
+    const { rating } = req.body;
+ 
+    let filters = {
+      where: {},
+    };
+ 
     if (page) {
       page = parseInt(page);
     }
     if (show) {
       show = parseInt(show);
     }
-    let filters = {
-      where: {
-        [Op.and]: [],
-        data: {},
-      },
-    };
+ 
+    if (rating && rating.length > 0) {
+      filters.where.rating = {
+        [Op.in]: rating.map(Number),
+      };
+    }
+ 
     let colleges;
-    // let filter = {};
-    
-      // Parse ratings string to an array of floats and then map them to integers
-      if (rating && rating.length > 0) {
-        filters.where[Op.and].push({
-          [Op.or]: rating.map((r) => ({
-            "data.rating": {
-              [Op.iLike]: `%${r}%`,
-            }, // Match any date in the array
-          })),
-        });
-      }
     if (page && show) {
       colleges = await College.findAll({
+        ...filters,
         offset: (page - 1) * show,
         limit: show,
       });
     } else {
-      colleges = await College.findAll();
+      colleges = await College.findAll(filters);
     }
-    const totalCount = await College.count();
-    res
-      .status(200)
-      .json({ message: "All colleges retrieved successfully", 
+ 
+    const totalCount = await College.count(filters);
+ 
+    res.status(200).json({
+      message: "All colleges retrieved successfully",
       colleges,
       currentPage: page,
-      totalPage:Math.ceil(totalCount/show),
+      totalPage: Math.ceil(totalCount / show),
       totalCount: totalCount,
-    
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving colleges", error: error.message });
+    res.status(500).json({ message: "Error retrieving colleges", error: error.message });
   }
 };
 
