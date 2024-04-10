@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const databaseUrl = "postgresql://postgres:9910@localhost:5432/edmertion";
+
+const databaseUrl = "postgresql://postgres:root@localhost:5432/edmertion"
 
 const match = databaseUrl.match(/^postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
 if (!match) {

@@ -13,7 +13,7 @@ const ServiceFAQ = sequelize.define('ServiceFAQ', {
     },
     type: {
         type: DataTypes.ENUM('course', 'college', 'scholarship', 'loan', 'coaching', 'all'), // Define the ENUM data type with possible values
-        allowNull: false,
+        allowNull: true,
     }
 }, {
     tableName: 'ServiceFAQs',
@@ -21,6 +21,7 @@ const ServiceFAQ = sequelize.define('ServiceFAQ', {
 
 const createServiceFAQ = async (addData) => {
     try {
+        addData.type = addData.type || 'all';
         const add = await ServiceFAQ.create(addData);
         return add;
     } catch (error) {

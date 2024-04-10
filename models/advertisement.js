@@ -18,7 +18,6 @@ const Advertisement = sequelize.define('Advertisement', {
   },
   imageUrl: {
     type: DataTypes.STRING,
-    allowNull: true,
   },
 }, {
   tableName: 'Advertisements',

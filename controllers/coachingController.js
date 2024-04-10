@@ -3,7 +3,9 @@ const { Op } = require("sequelize");
 // Create a coaching
 const create = async (req, res) => {
   try {
+    console.log("regbodyback",req.bo)
     const coaching = await createCoaching(req.body);
+
     res
       .status(201)
       .json({ message: "Coaching created successfully", coaching });
@@ -17,7 +19,8 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
   try {
-    let { page = 1, show = 10, search } = req.query;
+    let { page,show,search } = req.query;
+    // let { minRate, maxRate, minLoan, maxLoan } = req.body;
     const {
       locations,
       specializations,
