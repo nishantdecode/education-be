@@ -3,11 +3,11 @@ const router = require("express").Router();
 
 
 // Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECREAT,
-  });
+cloudinary.config({ 
+  cloud_name: 'dqoymwcc5', 
+  api_key: '656782736376434', 
+  api_secret: "uRxSwQ9Vpm1eAmpSUHdYcO63D3s" 
+});
 
 router.post("/single",async (req,res)=>{
     const file = req.files.file
