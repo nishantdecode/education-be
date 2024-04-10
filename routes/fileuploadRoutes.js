@@ -13,11 +13,21 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single('file');
 
-router.post("/single",async (req,res)=>{
-  const file = req.files.file
-  console.log({file})
-  const result = await cloudinary.uploader.upload(file.tempFilePath, { folder: "edmertion" });
-  res.send({fileUrl:result.url})
-})
+router.post("/single", upload, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Upload file to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.buffer, { folder: "edmertion" });
+  
+    // Send the file URL in the response
+    res.json({ fileUrl: result.url });
+  } catch (error) {
+    console.error('Error uploading file to Cloudinary:', error);
+    res.status(500).json({ message: 'Error uploading file' });
+  }
+});
 
 module.exports.FileUploadRouter = router;
