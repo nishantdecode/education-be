@@ -132,6 +132,32 @@ const getAllCoachings = async (req, res) => {
   }
 };
 
+const getFilterData = async (req, res) => {
+  try {
+    const filterData = await Coaching.aggregate('location', 'DISTINCT', { plain: false });
+    const locations = filterData.map(item => item.DISTINCT);
+    
+    const courses = await Coaching.aggregate('course', 'DISTINCT', { plain: false });
+    const coursesList = courses.map(item => item.DISTINCT);
+
+    const minPrice = await Coaching.min('fees');
+    const maxPrice = await Coaching.max('fees');
+
+    // Construct the response object
+    const filterObject = {
+      locations,
+      courses: coursesList,
+      minPrice,
+      maxPrice
+    };
+    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error retrieving course", error: error.message });
+  }
+};
+
 // Get a coaching by ID
 const getCoachingById = async (req, res) => {
   const { id } = req.params;
@@ -196,6 +222,7 @@ const deleteCoaching = async (req, res) => {
 module.exports = {
   create,
   getAllCoachings,
+  getFilterData,
   getCoachingById,
   updateCoaching,
   deleteCoaching,

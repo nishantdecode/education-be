@@ -3,9 +3,9 @@ const router = express.Router();
 const blogController = require('../controllers/blogController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage }).single('file');
+const upload = multer({ storage: storage }).single('image');
 
-router.post('/blogs', blogController.createAdd);
+router.post('/blogs', upload, blogController.createAdd);
 router.get('/blogs', blogController.getAllBlogs);
 router.get('/blogs/currentmonth', blogController.getAllBlogsCurrentMonth);
 router.get('/blogs/clicks', blogController.getAllBlogsByClicks);

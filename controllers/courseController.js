@@ -14,6 +14,8 @@ const create = async (req, res) => {
       .json({ message: "Error creating course", error: error.message });
   }
 };
+
+//
 const importCourseData = async (req, res) => {
   try {
     // const course = await createCourse(req.body);
@@ -220,6 +222,8 @@ const importCourseData = async (req, res) => {
       .json({ message: "Error creating course", error: error.message });
   }
 };
+
+//
 const getAllCourses = async (req, res) => {
   try {
     let { page, show,search } = req.query;
@@ -309,6 +313,37 @@ const getAllCourses = async (req, res) => {
   }
 };
 
+const getFilterData = async (req, res) => {
+  try {
+    const filterData = await Course.aggregate('platform', 'DISTINCT', { plain: false });
+    const platforms = filterData.map(item => item.DISTINCT);
+    
+    const languages = await Course.aggregate('language', 'DISTINCT', { plain: false });
+    const languagesList = languages.map(item => item.DISTINCT);
+
+    const modes = await Course.aggregate('mode', 'DISTINCT', { plain: false });
+    const modesList = modes.map(item => item.DISTINCT);
+
+    const minPrice = await Course.min('price');
+    const maxPrice = await Course.max('price');
+
+    // Construct the response object
+    const filterObject = {
+      platforms,
+      languages: languagesList,
+      modes: modesList,
+      minPrice,
+      maxPrice
+    };
+    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error retrieving course", error: error.message });
+  }
+};
+
+//
 const getCourseById = async (req, res) => {
   const { id } = req.params;
 
@@ -325,6 +360,7 @@ const getCourseById = async (req, res) => {
   }
 };
 
+//
 const updateCourse = async (req, res) => {
   const { id } = req.params;
 
@@ -344,6 +380,7 @@ const updateCourse = async (req, res) => {
   }
 };
 
+//
 const deleteCourse = async (req, res) => {
   const { id } = req.params;
 
@@ -366,6 +403,7 @@ const deleteCourse = async (req, res) => {
 module.exports = {
   create,
   getAllCourses,
+  getFilterData,
   getCourseById,
   updateCourse,
   deleteCourse,

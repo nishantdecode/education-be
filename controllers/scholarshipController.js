@@ -20,6 +20,7 @@ const getAllScholarships = async (req, res) => {
   try {
     let { page, show, search } = req.query;
     let { minAmount, maxAmount, "scholarship type":type, "offered by":offeredBy,"intake year":inTakeYear,minDeadLine,maxDeadLine } = req.body;
+    console.log(type, offeredBy, inTakeYear)
     let filters = {
       where: {
         [Op.and]:[],
@@ -59,7 +60,7 @@ const getAllScholarships = async (req, res) => {
     if(offeredBy && offeredBy.length>0){
       filters.where[Op.and].push({
         [Op.or]: offeredBy.map(offer => ({
-          'data.type': {
+          'data.eligibility': {
             [Op.iLike]: `%${offer}%`
           } // Match any date in the array
         }))
@@ -116,6 +117,37 @@ const getAllScholarships = async (req, res) => {
       .json({ message: "Error retrieving scholarships", error: error.message });
   }
 };
+
+const getFilterData = async (req, res) => {
+  try {
+    // Fetch all data objects
+    const allScholarships = await Scholarship.findAll();
+
+    // Extract distinct values for eligibility, organization, forYear, submission Date, and amount
+    const distinctEligibility = [...new Set(allScholarships.map(item => item.data.eligibility))];
+    const distinctOrganization = [...new Set(allScholarships.map(item => item.data.organization))];
+    const distinctForYear = [...new Set(allScholarships.map(item => item.data.forYear))];
+    const distinctSubmissionDate = [...new Set(allScholarships.map(item => item.data.importantDates['submission Date']))];
+    const minAmount = Math.min(...allScholarships.map(item => item.data.amount));
+    const maxAmount = Math.max(...allScholarships.map(item => item.data.amount));
+
+    // Construct the response object
+    const filterObject = {
+      eligibility: distinctEligibility,
+      organization: distinctOrganization,
+      forYear: distinctForYear,
+      submissionDate: distinctSubmissionDate,
+      priceRange: {
+        minAmount: minAmount,
+        maxAmount: maxAmount,
+      },
+    };
+    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving filter data", error: error.message });
+  }
+};
+
 
 // Get a scholarship by ID
 const getScholarshipById = async (req, res) => {
@@ -181,6 +213,7 @@ const deleteScholarship = async (req, res) => {
 module.exports = {
   create,
   getAllScholarships,
+  getFilterData,
   getScholarshipById,
   updateScholarship,
   deleteScholarship,

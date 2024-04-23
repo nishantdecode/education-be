@@ -6,6 +6,8 @@ const { VerificationRequest } = require('../models/verificationTag');
 const { Blog } = require('../models/blog');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid'); // Import the UUID function
+const { sendMail } = require('../middlewares/mailSender.helper');
+const { createOTP, OTP } = require('../models/otp');
 
 const SECRET_KEY = 'EDMERTION_SECRET'; // Replace this with a secure secret key
 
@@ -22,20 +24,41 @@ const generateUserId = (stateAcronym, age, sequenceNo, nameInitials) => {
 
 const sendOtp = async (req, res) => {
     // Assuming OTP is generated here, replace with actual OTP generation logic
-    const otp = '123456'; // Static OTP for demo purposes
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await createOTP({
+        value : otp,
+        email : req.body.email,
+        mobile : req.body.mobile
+    })
+    await sendMail(
+        email,
+        "OTP Verification",
+        `Your OTP for verification is: ${otp}`
+      );
     res.status(200).json({ message: 'OTP sent successfully' });
 };
 
 const verifyOtp = async (req, res) => {
     const { email, mobile, otp } = req.body;
 
+    let otpFound;
+    if(email) {
+        otpFound = await OTP.findOne({ where: { email } });
+    } else {
+        otpFound = await OTP.findOne({ where: { mobile } });
+    }
     // Assuming OTP verification logic here, replace with actual verification logic
-    const isOtpValid = otp === '123456'; // Static OTP for demo purposes
-
-    if (isOtpValid) {
-        // Save email and mobile to the database
-        req.userData = { email, mobile };
-        res.status(200).json({ message: 'OTP verified successfully' });
+    let isOtpValid = false;
+    if(otpFound) {
+        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
+        if (isOtpValid) {
+            // Save email and mobile to the database
+            req.userData = { email, mobile };
+            await otpFound.destroy();
+            res.status(200).json({ message: 'OTP verified successfully' });
+        } else {
+            res.status(401).json({ message: 'OTP verification failed' });
+        }
     } else {
         res.status(401).json({ message: 'OTP verification failed' });
     }
@@ -92,16 +115,29 @@ const signup = async (req, res) => {
 };
 
 const verifyMobileOtp = async (mobile, otp) => {
+    let otpFound = await OTP.findOne({ where: { mobile } });
     // Assuming OTP verification logic here, replace with actual verification logic
-
-    const isOtpValid = otp === '123456'; // Static OTP for demo purposes
+    let isOtpValid = false;
+    if(otpFound) {
+        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
+        if (isOtpValid) {
+            await otpFound.destroy();
+        }
+    }
 
     return isOtpValid;
 };
 
 const verifyEmailOtp = async (email, otp) => {
-    // Assuming OTP verification logic here, replace with actual verification logic
-    const isOtpValid = otp === '123456'; // Static OTP for demo purposes
+    let otpFound = await OTP.findOne({ where: { email } });
+
+    let isOtpValid = false;
+    if(otpFound) {
+        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
+        if (isOtpValid) {
+            await otpFound.destroy();
+        }
+    }
 
     return isOtpValid;
 };
@@ -145,6 +181,7 @@ const findUserByEmail = async (email) => {
         const user = await User.findOne({ where: { email } });
         return user;
     } catch (error) {
+        console.log(error)
         throw new Error('Error finding user by email');
     }
 };
@@ -269,9 +306,10 @@ const getUserInfoPercentage = (user) => {
 const getUserDataWithInfoPercentage = async (req, res) => {
     const { userId } = req.params; // Assuming the user ID is provided as a parameter
 
+    console.log(userId)
     try {
         const user = await User.findOne({ where: { userId } });
-
+console.log(user)
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

@@ -10,7 +10,7 @@ require('dotenv').config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_APIKEY,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
@@ -47,7 +47,6 @@ app.get('/', (req, res) => {
 
 // Add routes
 app.use('/api', routes);
-console.log('helloworld')
 sequelize
   .authenticate()
   .then(() => {

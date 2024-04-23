@@ -77,26 +77,64 @@ const importCollegeData = async (req, res) => {
 
 const getAllColleges = async (req, res) => {
   try {
-    let { page, show } = req.query;
-    const { rating } = req.body;
- 
-    let filters = {
-      where: {},
-    };
- 
+    let { page, show,search } = req.query;
+    let {locations,minFees,maxFees,courses,ratings} = req.body;
+    const filters = {
+      where: {
+        [Op.and]:[]
+      },
+    }
+
+    if(search){
+      filters.where.title ={
+        [Op.iLike]: `%${search}%` 
+      }
+    }
+    if (courses && courses.length > 0) {
+      const courseFilters = courses.map((md) => ({
+        "course": {
+          [Op.iLike]: `%${md}%`,
+        },
+      }));
+      filters.where[Op.and].push({ [Op.or]: courseFilters });
+    }
+    if (locations && locations.length > 0) {
+      const locationFilters = locations.map((lng) => ({
+        "location": {
+          [Op.iLike]: `%${lng}%`,
+        },
+      }));
+      filters.where[Op.and].push({ [Op.or]: locationFilters });
+    }
+
+    if (minFees) {
+      filters.where.price = {
+        [Op.gt]: minFees,
+      };
+    }
+    if (maxFees) {
+      if (filters.where.price) {
+        filters.where.price[Op.lt] = maxFees;
+      } else {
+        filters.where.price = {
+          [Op.lt]: maxFees,
+        };
+      }
+    }
+    if (ratings && ratings.length > 0) {
+      const ratingFilters = ratings.map((r) => ({
+        "rating": {
+          [Op.iLike]: `%${r}%`,
+        },
+      }));
+      filters.where[Op.and].push(...ratingFilters);
+    }
     if (page) {
       page = parseInt(page);
     }
     if (show) {
       show = parseInt(show);
     }
- 
-    if (rating && rating.length > 0) {
-      filters.where.rating = {
-        [Op.in]: rating.map(Number),
-      };
-    }
- 
     let colleges;
     if (page && show) {
       colleges = await College.findAll({
@@ -105,7 +143,7 @@ const getAllColleges = async (req, res) => {
         limit: show,
       });
     } else {
-      colleges = await College.findAll(filters);
+      colleges = await College.findAll({...filters});
     }
  
     const totalCount = await College.count(filters);
@@ -119,6 +157,32 @@ const getAllColleges = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Error retrieving colleges", error: error.message });
+  }
+};
+
+const getFilterData = async (req, res) => {
+  try {
+    const filterData = await College.aggregate('location', 'DISTINCT', { plain: false });
+    const locations = filterData.map(item => item.DISTINCT);
+    
+    const courses = await College.aggregate('course', 'DISTINCT', { plain: false });
+    const coursesList = courses.map(item => item.DISTINCT);
+
+    const minPrice = await College.min('fees');
+    const maxPrice = await College.max('fees');
+
+    // Construct the response object
+    const filterObject = {
+      locations,
+      courses: coursesList,
+      minPrice,
+      maxPrice
+    };
+    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error retrieving course", error: error.message });
   }
 };
 
@@ -182,6 +246,7 @@ const deleteCollege = async (req, res) => {
 module.exports = {
   create,
   getAllColleges,
+  getFilterData,
   getCollegeById,
   updateCollege,
   deleteCollege,

@@ -8,6 +8,8 @@ router.post('/', scholarshipController.create);
 // Get all scholarships
 router.post('/all', scholarshipController.getAllScholarships);
 
+router.post('/filter', scholarshipController.getFilterData);
+
 // Get a scholarship by ID
 router.get('/:id', scholarshipController.getScholarshipById);
 
