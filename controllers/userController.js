@@ -31,7 +31,7 @@ const sendOtp = async (req, res) => {
         mobile : req.body.mobile
     })
     await sendMail(
-        email,
+        req.body.email,
         "OTP Verification",
         `Your OTP for verification is: ${otp}`
       );
@@ -41,24 +41,30 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
     const { email, mobile, otp } = req.body;
 
+    console.log(email, otp)
     let otpFound;
     if(email) {
-        otpFound = await OTP.findOne({ where: { email } });
+        otpFound = await OTP.findAll({ where: { email } });
     } else {
-        otpFound = await OTP.findOne({ where: { mobile } });
+        otpFound = await OTP.findAll({ where: { mobile } });
     }
+
+    console.log(otpFound)
     // Assuming OTP verification logic here, replace with actual verification logic
     let isOtpValid = false;
-    if(otpFound) {
-        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
-        if (isOtpValid) {
-            // Save email and mobile to the database
-            req.userData = { email, mobile };
-            await otpFound.destroy();
-            res.status(200).json({ message: 'OTP verified successfully' });
-        } else {
-            res.status(401).json({ message: 'OTP verification failed' });
-        }
+
+    if (otpFound.length > 0) {
+        // Check if any OTP matches the provided OTP
+        isOtpValid = otpFound.some(entry => entry.value === otp); // Static OTP for demo purposes
+    }
+
+    console.log(isOtpValid)
+    if (isOtpValid) {
+        // Save email and mobile to the database
+        req.userData = { email, mobile };
+        // Assuming you want to delete all found OTPs
+        await OTP.destroy({ where: { id: otpFound.map(entry => entry.id) } });
+        res.status(200).json({ message: 'OTP verified successfully' });
     } else {
         res.status(401).json({ message: 'OTP verification failed' });
     }
@@ -115,30 +121,32 @@ const signup = async (req, res) => {
 };
 
 const verifyMobileOtp = async (mobile, otp) => {
-    let otpFound = await OTP.findOne({ where: { mobile } });
-    // Assuming OTP verification logic here, replace with actual verification logic
+    let otpFound = await OTP.findAll({ where: { mobile } });
+
     let isOtpValid = false;
-    if(otpFound) {
-        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
-        if (isOtpValid) {
-            await otpFound.destroy();
-        }
+
+    if (otpFound.length > 0) {
+        isOtpValid = otpFound.some(entry => entry.value === otp);
     }
 
+    if (isOtpValid) {
+        await OTP.destroy({ where: { id: otpFound.map(entry => entry.id) } });
+    }
     return isOtpValid;
 };
 
 const verifyEmailOtp = async (email, otp) => {
-    let otpFound = await OTP.findOne({ where: { email } });
+    let otpFound = await OTP.findAll({ where: { email } });
 
     let isOtpValid = false;
-    if(otpFound) {
-        isOtpValid = otp === otpFound.value; // Static OTP for demo purposes
-        if (isOtpValid) {
-            await otpFound.destroy();
-        }
+
+    if (otpFound.length > 0) {
+        isOtpValid = otpFound.some(entry => entry.value === otp);
     }
 
+    if (isOtpValid) {
+        await OTP.destroy({ where: { id: otpFound.map(entry => entry.id) } });
+    }
     return isOtpValid;
 };
 
