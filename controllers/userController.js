@@ -70,14 +70,13 @@ const verifyOtp = async (req, res) => {
     }
 };
 
-
 const signup = async (req, res) => {
     const { role, email, mobile, firstName, lastName, dateOfBirth, country, state, city } = req.body;
 
     // Calculate age from date of birth (assuming it's provided during signup)
     const age = calculateAge(dateOfBirth).toString();
 
-    // Assuming email and mobile verification are successful
+    // Assuming email andc mobile verification are successful
     const isEmailVerified = true;
     const isMobileVerified = true;
 

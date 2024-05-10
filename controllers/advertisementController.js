@@ -133,6 +133,27 @@ const getAllAdvertisements = async (req, res) => {
     }
 };
 
+const getAdvertisementByTitle = async (req, res) => {
+    try {
+        const { title } = req.body;
+        console.log(req.body)
+        const advertisement = await Advertisement.findOne({ 
+            where: { title },
+            order: [['createdAt', 'DESC']]
+        });
+
+        console.log(advertisement)
+        if (!advertisement) {
+            return res.status(404).json({ message: 'Advertisement not found' });
+        }
+
+        res.status(200).json({ message: 'Advertisement retrieved successfully', advertisement });
+    } catch (error) {
+        console.error('Error retrieving advertisement:', error);
+        res.status(500).json({ message: 'Error retrieving advertisement', error: error.message });
+    }
+};
+
 const getAdvertisementById = async (req, res) => {
     const { id } = req.params;
 
@@ -189,6 +210,7 @@ const deleteAdvertisement = async (req, res) => {
 module.exports = {
     createAdd,
     getAllAdvertisements,
+    getAdvertisementByTitle,
     getAdvertisementById,
     updateAdvertisement,
     deleteAdvertisement,

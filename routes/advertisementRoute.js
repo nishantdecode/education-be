@@ -9,6 +9,7 @@ const upload = multer({ storage });
 // router.post('/post', upload.single('image'), advertisementController.createAdd);
 router.post('/', advertisementController.createAdd);
 router.get('/get', advertisementController.getAllAdvertisements);
+router.post('/title', advertisementController.getAdvertisementByTitle);
 router.get('/:id', advertisementController.getAdvertisementById);
 router.put('/update/:id', advertisementController.updateAdvertisement);
 router.delete('/delete/:id', advertisementController.deleteAdvertisement);

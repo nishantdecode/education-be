@@ -61,9 +61,17 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  personality: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+  },
+  traits: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+  },
   profileImageUrl: {
     type: DataTypes.STRING,
-    allowNull: true, // Depending on your requirements, you might want to make it required
+    allowNull: true,
   },
   verificationStatus: {
     type: DataTypes.ENUM('none', 'pending', 'approved', 'rejected'),

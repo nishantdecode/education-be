@@ -26,6 +26,7 @@ const { Scholarship } = require('../models/scholarship');
 const { Loan } = require('../models/loan');
 const { Coaching } = require('../models/coaching');
 const { OTP } = require('../models/otp');
+const { Conversation } = require('../models/conversation');
 
 (async () => {
     try {
@@ -59,6 +60,7 @@ const { OTP } = require('../models/otp');
         await Loan.sync();
         await Coaching.sync();
         await OTP.sync();
+        await Conversation.sync();
 
         console.log('Tables created successfully');
     } catch (error) {
