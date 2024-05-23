@@ -136,13 +136,11 @@ const getAllAdvertisements = async (req, res) => {
 const getAdvertisementByTitle = async (req, res) => {
     try {
         const { title } = req.body;
-        console.log(req.body)
         const advertisement = await Advertisement.findOne({ 
             where: { title },
             order: [['createdAt', 'DESC']]
         });
 
-        console.log(advertisement)
         if (!advertisement) {
             return res.status(404).json({ message: 'Advertisement not found' });
         }

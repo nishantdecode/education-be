@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Conversation = sequelize.define('Conversation', {
-    name : {
+    name: {
         type: DataTypes.STRING,
     },
     conversationId: {

@@ -6,6 +6,7 @@ const http = require('http');
 const sequelize = require('./config/db'); // Import the sequelize instance
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
+const bodyParser = require("body-parser");
 require('dotenv').config();
 
 cloudinary.config({
@@ -14,10 +15,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
 const corsMiddleware = require('./middlewares/corsMiddleware');
 const helmetMiddleware = require('./middlewares/helmetMiddleware');
-const limiterMiddleware = require('./middlewares/rateLimitMiddleware');
+// const limiterMiddleware = require('./middlewares/rateLimitMiddleware');
 const sanitizeMiddleware = require('./middlewares/sanitizeMiddleware');
 const logMiddleware = require('./middlewares/logMiddleware');
 
@@ -29,9 +29,10 @@ const port = process.env.PORT || 3001;
 // Use middlewares
 app.use(corsMiddleware);
 app.use(helmetMiddleware);
-app.use(limiterMiddleware);
+// app.use(limiterMiddleware);
 app.use(sanitizeMiddleware);
 app.use(logMiddleware);
+app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(fileUpload({
 //   useTempFiles: true,
 //   tempFileDir: '/tmp/'

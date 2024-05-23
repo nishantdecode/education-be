@@ -25,6 +25,9 @@ const scholarshipRoutes = require('./scholarshipRoutes');
 const loanRoutes = require('./loanRoutes');
 const coachingRoutes = require('./coachingRoutes');
 const conversationRoutes = require('./conversationRoutes');
+const slotRoutes = require('./slotRoutes');
+const orderRoutes = require('./orderRoutes');
+const zoomRoutes = require('./zoomRoutes');
 const { FileUploadRouter } = require('./fileuploadRoutes');
 // Add other route files here if needed
 
@@ -53,5 +56,8 @@ router.use('/scholarship', scholarshipRoutes);
 router.use('/loan', loanRoutes);
 router.use('/coaching', coachingRoutes);
 router.use('/conversation', conversationRoutes);
+router.use('/slot', slotRoutes);
+router.use('/order', orderRoutes);
+router.use('/zoom', zoomRoutes);
 
 module.exports = router;

@@ -217,7 +217,7 @@ const loginWithEmailAndOtp = async (req, res) => {
 };
 
 const updateUserDetails = async (req, res) => {
-    const { userId, firstName, lastName, dateOfBirth, country, state, city, profileImageUrl, about, gender, interests, skills, school, qualification, college, profession } = req.body;
+    const { userId, firstName, lastName, dateOfBirth, country, state, city, profileImageUrl, about, gender, interests, skills, school, qualification, college, profession, personality, traits } = req.body;
 
     // Calculate age from date of birth (assuming it's provided during signup)
     const age = calculateAge(dateOfBirth).toString();
@@ -250,6 +250,8 @@ const updateUserDetails = async (req, res) => {
         if (qualification) user.qualification = qualification;
         if (college) user.college = college;
         if (profession) user.profession = profession;
+        if (personality) user.personality = personality;
+        if (traits) user.traits = traits;
 
         // Save the updated user details
         await user.save();
