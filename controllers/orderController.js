@@ -102,7 +102,7 @@ const paymentVerification = async (req, res) => {
     await slot.save();
 
     res.redirect(
-      `https://edmertion.onrender.com/chatting/paymentStatus?status=successful&orderId=${order.id}`
+      `http://localhost:3000/chatting/paymentStatus?status=successful&orderId=${order.id}`
     );
   } else {
     const { error } = req.body;
@@ -115,7 +115,7 @@ const paymentVerification = async (req, res) => {
     order.status = 'Failed';
     await order.save();
     res.redirect(
-      `https://edmertion.onrender.com/chatting/paymentStatus?status=failed&orderId=null`
+      `http://localhost:3000/chatting/paymentStatus?status=failed&orderId=null`
     );
   }
 };

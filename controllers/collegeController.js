@@ -68,73 +68,77 @@ const importCollegeData = async (req, res) => {
       .json({ message: "Error creating college", error: error.message });
   }
 };
-// let filters = {
-//   where: {
-//     [Op.and]: [],
-//     data: {},
-//   },
-// };
 
 const getAllColleges = async (req, res) => {
   try {
-    let { page, show,search } = req.query;
-    let {locations,minFees,maxFees,courses,ratings} = req.body;
+    let { page, show, search } = req.query;
+    let { locations, minFees, maxFees, courses, ratings } = req.body;
+
+    minFees = minFees ? parseInt(minFees, 10) : null;
+    maxFees = maxFees ? parseInt(maxFees, 10) : null;
+
     const filters = {
       where: {
-        [Op.and]:[]
+        [Op.and]: [],
       },
+    };
+
+    if (search) {
+      filters.where.title = {
+        [Op.iLike]: `%${search}%`,
+      };
     }
 
-    if(search){
-      filters.where.title ={
-        [Op.iLike]: `%${search}%` 
-      }
-    }
     if (courses && courses.length > 0) {
       const courseFilters = courses.map((md) => ({
-        "course": {
+        course: {
           [Op.iLike]: `%${md}%`,
         },
       }));
       filters.where[Op.and].push({ [Op.or]: courseFilters });
     }
+
     if (locations && locations.length > 0) {
       const locationFilters = locations.map((lng) => ({
-        "location": {
+        location: {
           [Op.iLike]: `%${lng}%`,
         },
       }));
       filters.where[Op.and].push({ [Op.or]: locationFilters });
     }
 
-    if (minFees) {
-      filters.where.price = {
+    if (minFees !== null) {
+      filters.where.fees = {
         [Op.gt]: minFees,
       };
     }
-    if (maxFees) {
-      if (filters.where.price) {
-        filters.where.price[Op.lt] = maxFees;
+
+    if (maxFees !== null) {
+      if (filters.where.fees) {
+        filters.where.fees[Op.lt] = maxFees;
       } else {
-        filters.where.price = {
+        filters.where.fees = {
           [Op.lt]: maxFees,
         };
       }
     }
+
     if (ratings && ratings.length > 0) {
       const ratingFilters = ratings.map((r) => ({
-        "rating": {
+        rating: {
           [Op.iLike]: `%${r}%`,
         },
       }));
       filters.where[Op.and].push(...ratingFilters);
     }
+
     if (page) {
       page = parseInt(page);
     }
     if (show) {
       show = parseInt(show);
     }
+    
     let colleges;
     if (page && show) {
       colleges = await College.findAll({
@@ -143,11 +147,11 @@ const getAllColleges = async (req, res) => {
         limit: show,
       });
     } else {
-      colleges = await College.findAll({...filters});
+      colleges = await College.findAll({ ...filters });
     }
- 
+
     const totalCount = await College.count(filters);
- 
+
     res.status(200).json({
       message: "All colleges retrieved successfully",
       colleges,

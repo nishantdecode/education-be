@@ -19,18 +19,26 @@ const create = async (req, res) => {
 const getAllScholarships = async (req, res) => {
   try {
     let { page, show, search } = req.query;
-    let { minAmount, maxAmount, "scholarship type":type, "offered by":offeredBy,"intake year":inTakeYear,minDeadLine,maxDeadLine } = req.body;
-    console.log(type, offeredBy, inTakeYear)
+    let {
+      minAmount,
+      maxAmount,
+      "scholarship type": type,
+      "offered by": offeredBy,
+      "intake year": inTakeYear,
+      minDeadLine,
+      maxDeadLine,
+    } = req.body;
+    console.log(type, offeredBy, inTakeYear);
     let filters = {
       where: {
-        [Op.and]:[],
-        data:{}
+        [Op.and]: [],
+        data: {},
       },
     };
-    if(search){
-      filters.where.data.name ={
-        [Op.iLike]: `%${search}%` 
-      }
+    if (search) {
+      filters.where.data.name = {
+        [Op.iLike]: `%${search}%`,
+      };
     }
 
     if (minAmount) {
@@ -48,39 +56,41 @@ const getAllScholarships = async (req, res) => {
       }
     }
 
-    if(inTakeYear && inTakeYear.length>0){
+    if (inTakeYear && inTakeYear.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: inTakeYear.map(year => ({
-          'data.forYear': {
-            [Op.iLike]: `%${year}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: inTakeYear.map((year) => ({
+          "data.forYear": {
+            [Op.iLike]: `%${year}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-    if(offeredBy && offeredBy.length>0){
+    if (offeredBy && offeredBy.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: offeredBy.map(offer => ({
-          'data.eligibility': {
-            [Op.iLike]: `%${offer}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: offeredBy.map((offer) => ({
+          "data.eligibility": {
+            [Op.iLike]: `%${offer}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-    if(minDeadLine){
+    if (minDeadLine) {
       filters.where.data.importantDates = {
-        ["submission Date"]:{
-          [Op.gte]:new Date(minDeadLine)
-        }
-      }
-    } 
+        ["submission Date"]: {
+          [Op.gte]: new Date(minDeadLine),
+        },
+      };
+    }
     if (maxDeadLine) {
       if (filters.where.data.importantDates?.["submission Date"]) {
-        filters.where.data.importantDates["submission Date"][Op.lte]=new Date(maxDeadLine)
+        filters.where.data.importantDates["submission Date"][Op.lte] = new Date(
+          maxDeadLine
+        );
       } else {
         filters.where.data.importantDates = {
-          ["submission Date"]:{
-            [Op.lte]:new Date(maxDeadLine)
-          }
+          ["submission Date"]: {
+            [Op.lte]: new Date(maxDeadLine),
+          },
         };
       }
     }
@@ -98,19 +108,17 @@ const getAllScholarships = async (req, res) => {
         limit: show,
       });
     } else {
-      scholarships = await Scholarship.findAll({...filters});
+      scholarships = await Scholarship.findAll({ ...filters });
     }
-    const totalCount = await Scholarship.count({...filters});
+    const totalCount = await Scholarship.count({ ...filters });
 
-    res
-      .status(200)
-      .json({
-        message: "All scholarships retrieved successfully",
-        scholarships,
-        currentPage: page,
-        totalPage:Math.ceil(totalCount/show),
-        totalCount: totalCount,
-      });
+    res.status(200).json({
+      message: "All scholarships retrieved successfully",
+      scholarships,
+      currentPage: page,
+      totalPage: Math.ceil(totalCount / show),
+      totalCount: totalCount,
+    });
   } catch (error) {
     res
       .status(500)
@@ -123,13 +131,33 @@ const getFilterData = async (req, res) => {
     // Fetch all data objects
     const allScholarships = await Scholarship.findAll();
 
-    // Extract distinct values for eligibility, organization, forYear, submission Date, and amount
-    const distinctEligibility = [...new Set(allScholarships.map(item => item.data.eligibility))];
-    const distinctOrganization = [...new Set(allScholarships.map(item => item.data.organization))];
-    const distinctForYear = [...new Set(allScholarships.map(item => item.data.forYear))];
-    const distinctSubmissionDate = [...new Set(allScholarships.map(item => item.data.importantDates['submission Date']))];
-    const minAmount = Math.min(...allScholarships.map(item => item.data.amount));
-    const maxAmount = Math.max(...allScholarships.map(item => item.data.amount));
+    const distinctEligibility = [
+      ...new Set(
+        allScholarships.map((item) => item.data?.eligibility).filter(Boolean)
+      ),
+    ];
+    const distinctOrganization = [
+      ...new Set(
+        allScholarships.map((item) => item.data?.organization).filter(Boolean)
+      ),
+    ];
+    const distinctForYear = [
+      ...new Set(
+        allScholarships.map((item) => item.data?.forYear).filter(Boolean)
+      ),
+    ];
+    const distinctSubmissionDate = [
+      ...new Set(
+        allScholarships
+          .map((item) => item.data?.importantDates?.["submission Date"])
+          .filter(Boolean)
+      ),
+    ];
+    const amounts = allScholarships
+      .map((item) => item.data?.amount)
+      .filter((amount) => amount !== undefined && amount !== null);
+    const minAmount = amounts.length > 0 ? Math.min(...amounts) : undefined;
+    const maxAmount = amounts.length > 0 ? Math.max(...amounts) : undefined;
 
     // Construct the response object
     const filterObject = {
@@ -142,12 +170,15 @@ const getFilterData = async (req, res) => {
         maxAmount: maxAmount,
       },
     };
-    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+    res
+      .status(200)
+      .json({ message: "Filter data retrieved successfully", filterObject });
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving filter data", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error retrieving filter data", error: error.message });
   }
 };
-
 
 // Get a scholarship by ID
 const getScholarshipById = async (req, res) => {
