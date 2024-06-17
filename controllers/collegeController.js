@@ -84,10 +84,17 @@ const getAllColleges = async (req, res) => {
     };
 
     if (search) {
-      filters.where.title = {
-        [Op.iLike]: `%${search}%`,
+      filters.where[Op.or] = {
+        name: {
+          [Op.iLike]: `%${search}%`,
+        },
+        location: {
+          [Op.iLike]: `%${search}%`,
+        }
+        // Add more columns as needed
       };
     }
+    
 
     if (courses && courses.length > 0) {
       const courseFilters = courses.map((md) => ({
@@ -125,12 +132,12 @@ const getAllColleges = async (req, res) => {
 
     if (ratings && ratings.length > 0) {
       const ratingFilters = ratings.map((r) => ({
-        rating: {
-          [Op.iLike]: `%${r}%`,
-        },
+        rating: r,
       }));
-      filters.where[Op.and].push(...ratingFilters);
+    
+      filters.where[Op.and].push({ [Op.or]: ratingFilters });
     }
+    
 
     if (page) {
       page = parseInt(page);

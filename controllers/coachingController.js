@@ -1,9 +1,9 @@
 const { Coaching, createCoaching } = require("../models/coaching");
-const { Op } = require("sequelize");
+const { DataTypes, Op, fn, col} = require("sequelize");
+const sequelize = require('../config/db');
 // Create a coaching
 const create = async (req, res) => {
   try {
-    console.log("regbodyback",req.bo)
     const coaching = await createCoaching(req.body);
 
     res
@@ -134,29 +134,51 @@ const getAllCoachings = async (req, res) => {
 
 const getFilterData = async (req, res) => {
   try {
-    const filterData = await Coaching.aggregate('location', 'DISTINCT', { plain: false });
-    const locations = filterData.map(item => item.DISTINCT);
-    
-    const courses = await Coaching.aggregate('course', 'DISTINCT', { plain: false });
-    const coursesList = courses.map(item => item.DISTINCT);
+    // Extract distinct locations from JSONB field
+    const locationsData = await Coaching.findAll({
+      attributes: [
+        [sequelize.fn('DISTINCT', sequelize.literal('data->>\'location\'')), 'location'],
+      ],
+      raw: true,
+    });
+    const locations = locationsData.map(item => item.location);
 
-    const minPrice = await Coaching.min('fees');
-    const maxPrice = await Coaching.max('fees');
+    // Extract distinct courses from JSONB field
+    const coursesData = await Coaching.findAll({
+      attributes: [
+        [sequelize.fn('DISTINCT', sequelize.literal('data->>\'course\'')), 'course'],
+      ],
+      raw: true,
+    });
+    const coursesList = coursesData.map(item => item.course);
+
+    // Extract min and max fees from nested JSONB fields
+    const minFeesData = await Coaching.findAll({
+      attributes: [[sequelize.fn('MIN', sequelize.cast(sequelize.literal('data->\'fees\'->>\'min\''), 'INTEGER')), 'minFees']],
+      raw: true,
+    });
+    const maxFeesData = await Coaching.findAll({
+      attributes: [[sequelize.fn('MAX', sequelize.cast(sequelize.literal('data->\'fees\'->>\'max\''), 'INTEGER')), 'maxFees']],
+      raw: true,
+    });
+    const minPrice = minFeesData[0].minFees;
+    const maxPrice = maxFeesData[0].maxFees;
 
     // Construct the response object
     const filterObject = {
       locations,
       courses: coursesList,
       minPrice,
-      maxPrice
+      maxPrice,
     };
+
     res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving course", error: error.message });
+    res.status(500).json({ message: "Error retrieving filter data", error: error.message });
   }
 };
+
+
 
 // Get a coaching by ID
 const getCoachingById = async (req, res) => {

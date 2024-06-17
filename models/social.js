@@ -10,7 +10,7 @@ const Social = sequelize.define('Social', {
   },
   platform: {
     type: DataTypes.STRING,
-    allowNull: false,
+   
   },
   link: {
     type: DataTypes.STRING,

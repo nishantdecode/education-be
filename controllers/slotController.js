@@ -2,66 +2,87 @@ const { Slot } = require("../models/slot");
 const { Op } = require("sequelize");
 
 const create = async (req, res) => {
-  let slots = [];
-  console.log(req.body);
-  if (req.body.slots) {
-    slots = [...req.body.slots];
-  }
-  const checkers = [];
-  for (let slot of slots) {
-    checkers.push(
-      Slot.findOne({
-        where: {
-          [Op.or]: [
-            {
-              startTime: { [Op.gte]: new Date(slot.startTime) },
-              endTime: { [Op.lte]: new Date(slot.endTime) },
-            },
-            {
-              startTime: { [Op.gte]: new Date(slot.endTime) },
-              endTime: { [Op.lte]: new Date(slot.endTime) },
-            },
-            {
-              startTime: { [Op.lte]: new Date(slot.startTime) },
-              endTime: { [Op.gte]: new Date(slot.endTime) },
-            },
-          ],
-        },
-      })
-    );
-  }
-  const checkResults = await Promise.all(checkers);
-  for await (let check of checkResults) {
-    if (check) {
-      return res.status(400).send({
-        error: `Slot already created in this time range!`,
-      });
-    }
-  }
-
-  const promises = [];
-  for (let slot of slots) {
-    const appointment = await Slot.create({
-      startDate: new Date(slot.startDate),
-      endDate: new Date(slot.endDate),
-      startTime: new Date(slot.startTime),
-      endTime: new Date(slot.endTime),
-      status: "Available",
-      slotDuration: slot.slotDuration,
-      price: slot.price,
-    });
-    promises.push(appointment);
-  }
-
   try {
-    await Promise.all(promises);
+    let slots = [];
+    console.log('Request body:', req.body);
+
+    if (req.body.slots) {
+      slots = [...req.body.slots];
+    } else {
+      return res.status(400).send({ error: "No slots provided" });
+    }
+
+    const checkers = [];
+    for (let slot of slots) {
+      const startTime = new Date(slot.startTime).toISOString();
+      const endTime = new Date(slot.endTime).toISOString();
+
+      checkers.push(
+        Slot.findOne({
+          where: {
+            [Op.or]: [
+              {
+                startTime: { [Op.gte]: startTime },
+                endTime: { [Op.lte]: endTime },
+              },
+              {
+                startTime: { [Op.gte]: endTime },
+                endTime: { [Op.lte]: endTime },
+              },
+              {
+                startTime: { [Op.lte]: startTime },
+                endTime: { [Op.gte]: endTime },
+              },
+            ],
+          },
+        })
+      );
+    }
+
+    const checkResults = await Promise.all(checkers);
+    for (let check of checkResults) {
+      if (check) {
+        return res.status(400).send({
+          error: `Slot already created in this time range!`,
+        });
+      }
+    }
+
+    const promises = [];
+    for (let slot of slots) {
+      const startDate = new Date(slot.startDate).toISOString();
+      const endDate = new Date(slot.endDate).toISOString();
+      const startTime = new Date(slot.startTime).toISOString();
+      const endTime = new Date(slot.endTime).toISOString();
+
+      promises.push(
+        Slot.create({
+          startDate: startDate,
+          endDate: endDate,
+          startTime: startTime,
+          endTime: endTime,
+          status: "Available",
+          slotDuration: slot.slotDuration,
+          price: slot.price,
+        })
+      );
+    }
+
+    try {
+      await Promise.all(promises);
+      console.log('Slots successfully created');
+      res.send({ message: "Successfully created" });
+    } catch (error) {
+      console.log('Error during slot creation:', error);
+      res.status(500).send({ error: error.message });
+    }
+
   } catch (error) {
-    console.log({ error: error.message });
+    console.log('Error processing request:', error);
     res.status(500).send({ error: error.message });
   }
-
-  res.send({ message: "Successfully created" });
 };
+
 
 const getAllSlots = async (req, res) => {
   try {
@@ -97,15 +118,18 @@ const getAllSlotsByDate = async (req, res) => {
   const { date } = req.body;
 
   try {
+    // Parse the date and set it to the start of the day in UTC
     const parsedDate = new Date(date);
-
-    const startOfDay = new Date(parsedDate.setUTCHours(0, 0, 0, 0));
-    const endOfDay = new Date(parsedDate.setUTCHours(23, 59, 59, 999));
+    const startOfDay = new Date(Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate()));
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
 
     const slots = await Slot.findAll({
       where: {
-        startDate: { [Op.gte]: startOfDay },
-        endDate: { [Op.lte]: endOfDay },
+        startDate: { 
+          [Op.gte]: startOfDay,
+          [Op.lt]: endOfDay
+        }
       },
     });
 

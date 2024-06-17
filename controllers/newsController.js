@@ -3,35 +3,19 @@ const { News } = require('../models/news');
 const { createNews } = require('../models/news');
 
 const createAdd = async (req, res) => {
-    const { title, description, link, type } = req.body;
-    console.log("Uploaded Image File:", req.files.image);
-
-    if (!req.files || !req.files.image) {
-        return res.status(400).json({ message: 'No image file provided' });
-    }
-
-    const imageFile = req.files.image;
-    console.log("Image File Path:", imageFile.tempFilePath);
-
-    if (!imageFile.tempFilePath) {
-        return res.status(400).json({ message: 'Image file path is missing' });
-    }
+     // Ensure these fields match what's sent from the client
 
     try {
-        const result = await cloudinary.uploader.upload(imageFile.tempFilePath, { folder: "edmertion" });
-
-        const news = await createNews({ title, description, imageUrl: result.url, link, type });
+        const news = await createNews(req.body);
 
         res.status(201).json({ message: 'News created successfully', news });
     } catch (error) {
-        console.error('Error in createNews:', error);  // Log the complete error
-        res.status(500).json({
-            message: 'Error creating News',
-            error: error.message,  // Send detailed error message
-            stack: error.stack     // Optionally include the stack trace
-        });
-    }
+        res
+          .status(500)
+          .json({ message: "Error creating coaching", error: error.message });
+      }
 };
+
 
 const getAllNewss = async (req, res) => {
     try {

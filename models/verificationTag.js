@@ -15,11 +15,11 @@ const VerificationRequest = sequelize.define('VerificationRequest', {
         defaultValue: 'pending',
     },
     UserId: {
-        type: DataTypes.STRING, // Adjust the data type based on your User model's primary key type
+        type: DataTypes.STRING, // Adjust based on your User model's primary key type
         allowNull: false,
         references: {
             model: User,
-            key: 'userId', // Replace with the actual primary key of the User model
+            key: 'id', // Assuming 'id' is the primary key of the User model
         },
     },
 });

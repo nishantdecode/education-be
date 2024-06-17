@@ -19,7 +19,7 @@ const College = sequelize.define(
       defaultValue: [],
     },
     fees: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.FLOAT,
       allowNull: true,
     },
     duration: {

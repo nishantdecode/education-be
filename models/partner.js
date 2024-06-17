@@ -12,19 +12,11 @@ const Partner = sequelize.define('Partner', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  imageUrl: {
+ url: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  link: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  type: {
+  sources: {
     type: DataTypes.STRING,
     allowNull: true,
   },

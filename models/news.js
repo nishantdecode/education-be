@@ -12,22 +12,22 @@ const News = sequelize.define('News', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  description: {
+  article: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  imageUrl: {
+  url: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  link: {
+  sources: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  type: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
+  // type: {
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
 }, {
   tableName: 'Newss',
 });

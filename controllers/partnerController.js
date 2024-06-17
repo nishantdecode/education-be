@@ -1,11 +1,11 @@
-const { Partner } = require('../models/partner');
-const { createPartner } = require('../models/partner');
+const { Partner, createPartner } = require('../models/partner');
+
 
 const createAdd = async (req, res) => {
-    const { title, description, imageUrl, link, type } = req.body;
+    const { title, sources,url } = req.body;
 
     try {
-        const partner = await createPartner({ title, description, imageUrl, link, type });
+        const partner = await createPartner({ title,sources,url });
         res.status(201).json({ message: 'Partner created successfully', partner });
     } catch (error) {
         res.status(500).json({ message: 'Error creating partner', error: error.message });
@@ -82,4 +82,5 @@ module.exports = {
     getPartnerById,
     updatePartner,
     deletePartner,
+    
 };
