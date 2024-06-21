@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
-
+""
 
 const databaseUrl = "postgresql://postgres:root@localhost:5432/edmertion"
 

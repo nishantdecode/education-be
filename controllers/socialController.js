@@ -2,15 +2,29 @@ const { Social } = require('../models/social');
 const { createSocial } = require('../models/social');
 
 const createAdd = async (req, res) => {
-    const { platform, link } = req.body;
-
+    const socialData = req.body;
+  
     try {
+      if (Array.isArray(socialData)) {
+        // If the client sends an array of social media data
+        const createdSocials = await Promise.all(
+          socialData.map(async (data) => {
+            const { platform, link } = data;
+            const social = await createSocial({ platform, link });
+            return social;
+          })
+        );
+        res.status(201).json({ message: 'Socials created successfully', socials: createdSocials });
+      } else {
+        // If the client sends a single object
+        const { platform, link } = socialData;
         const social = await createSocial({ platform, link });
         res.status(201).json({ message: 'Social created successfully', social });
+      }
     } catch (error) {
-        res.status(500).json({ message: 'Error creating social', error: error.message });
+      res.status(500).json({ message: 'Error creating socials', error: error.message });
     }
-};
+  };
 
 const getAllSocials = async (req, res) => {
     try {

@@ -3,24 +3,25 @@ const { Offer } = require('../models/offer');
 const { createOffer } = require('../models/offer');
 
 const createAdd = async (req, res) => {
-    const { title, description } = req.body;
-    console.log("Uploaded Image File:", req.files.image);
+    const { title, description,imageUrl } = req.body;
+    // console.log("Uploaded Image File:", req.files.image);
+    console.log(imageUrl)
 
-    if (!req.files || !req.files.image) {
-        return res.status(400).json({ message: 'No image file provided' });
-    }
+    // if (!req.files || !req.files.image) {
+    //     return res.status(400).json({ message: 'No image file provided' });
+    // }
 
-    const imageFile = req.files.image;
-    console.log("Image File Path:", imageFile.tempFilePath);
+    // const imageFile = req.files.image;
+    // console.log("Image File Path:", imageFile.tempFilePath);
 
-    if (!imageFile.tempFilePath) {
-        return res.status(400).json({ message: 'Image file path is missing' });
-    }
+    // if (!imageFile.tempFilePath) {
+    //     return res.status(400).json({ message: 'Image file path is missing' });
+    // }
 
     try {
-        const result = await cloudinary.uploader.upload(imageFile.tempFilePath, { folder: "edmertion" });
+        // const result = await cloudinary.uploader.upload(imageFile.tempFilePath, { folder: "edmertion" });
 
-        const offer = await createOffer({ title, description, imageUrl: result.url });
+        const offer = await createOffer({ title, description,imageUrl});
 
         res.status(201).json({ message: 'Offer created successfully', offer });
     } catch (error) {

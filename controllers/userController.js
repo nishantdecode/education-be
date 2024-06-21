@@ -21,22 +21,69 @@ const calculateAge = (dateOfBirth) => {
 const generateUserId = (stateAcronym, age, sequenceNo, nameInitials) => {
     return `${stateAcronym}${age.toString().padStart(2, '0')}${sequenceNo.toString().padStart(4, '0')}${nameInitials}`;
 };
-
 const sendOtp = async (req, res) => {
-    // Assuming OTP is generated here, replace with actual OTP generation logic
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await createOTP({
-        value : otp,
-        email : req.body.email,
-        mobile : req.body.mobile
-    })
-    await sendMail(
-        req.body.email,
-        "OTP Verification",
-        `Your OTP for verification is: ${otp}`
-      );
-    res.status(200).json({ message: 'OTP sent successfully' });
-};
+    try {
+      const { email, mobile } = req.body;
+      console.log(email, mobile);
+  
+      // Check if the email exists in the database
+      const user = await User.findOne({ where: { email } });
+  
+      if (!user) {
+        console.log('Email not found');
+        return res.status(404).json({ message: 'Email not found', emailExists: false });
+      }
+  
+      console.log("DBUSER", user.email);
+  
+      // Hardcoded OTP for testing
+      const otp = '123456';
+  
+      // Save OTP to the database
+      await createOTP({ value: otp, email, mobile });
+  
+      // Send OTP via email
+      await sendMail(email, "OTP Verification", `Your OTP for verification is: ${otp}`);
+  
+      return res.status(200).json({ message: 'OTP sent successfully', emailExists: true });
+    } catch (error) {
+      console.error(`Error in sendOtp for email ${req.body.email}:`, error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  const sendOtptest = async (req, res) => {
+    try {
+      const { email, mobile } = req.body;
+      console.log(email, mobile);
+  
+      // Check if the email and mobile exist in the database
+      const existingUser = await User.findOne({ where: { email, mobile } });
+  
+      if (existingUser) {
+        console.log('User with email and mobile already exists');
+        return res.status(400).json({ message: 'User with email and mobile already exists', emailExists: true });
+      }
+  
+      // Hardcoded OTP for testing
+      const otp = '123456';
+  
+      // Save OTP to the database
+      await createOTP({ value: otp, email, mobile });
+  
+      // Send OTP via email
+      await sendMail(email, "OTP Verification", `Your OTP for verification is: ${otp}`);
+  
+      return res.status(200).json({ message: 'OTP sent successfully', emailExists: false });
+    } catch (error) {
+      console.error(`Error in sendOtp for email ${req.body.email}:`, error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  
+  
+  
 
 const verifyOtp = async (req, res) => {
     const { email, mobile, otp } = req.body;
@@ -438,6 +485,7 @@ const getUserTagsAndBlogs = async (req, res) => {
 
 module.exports = {
     sendOtp,
+    sendOtptest,
     verifyOtp,
     signup,
     loginWithMobileAndOtp,

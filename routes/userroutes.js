@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const {
     sendOtp,
+    sendOtptest,
     verifyOtp,
     signup,
     loginWithMobileAndOtp,
@@ -20,7 +21,7 @@ const {
 
 // Send OTP route
 router.post('/sendotp', sendOtp);
-
+router.post('/sendotptest', sendOtptest);
 // Verify OTP route
 router.post('/verifyotp', verifyOtp);
 
