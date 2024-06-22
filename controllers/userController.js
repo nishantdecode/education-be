@@ -271,10 +271,15 @@ const updateUserDetails = async (req, res) => {
 
     try {
         // Convert interests from a comma-separated string to an array of tags
-        const interestArray = interests ? interests.split(',').map(interest => interest.trim()) : []
+        const interestArray = Array.isArray(interests) 
+            ? interests 
+            : (interests ? interests.split(',').map(interest => interest.trim()) : []);
 
         // Convert skills from a comma-separated string to an array of tags
-        const skillArray = skills ? skills?.split(',').map(skill => skill.trim()) : []
+        const skillArray = Array.isArray(skills) 
+            ? skills 
+            : (skills ? skills.split(',').map(skill => skill.trim()) : []);
+
         const user = await User.findOne({ where: { userId } });
 
         if (!user) {
@@ -308,6 +313,8 @@ const updateUserDetails = async (req, res) => {
         res.status(500).json({ message: 'Error updating user details', error: error.message });
     }
 };
+
+
 
 const getAllUsers = async (req, res) => {
     try {

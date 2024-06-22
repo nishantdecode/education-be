@@ -19,8 +19,7 @@ const create = async (req, res) => {
 // Get all coachings
 const getAllCoachings = async (req, res) => {
   try {
-    let { page,show,search } = req.query;
-    // let { minRate, maxRate, minLoan, maxLoan } = req.body;
+    let { page, show, search } = req.query;
     const {
       locations,
       specializations,
@@ -30,94 +29,78 @@ const getAllCoachings = async (req, res) => {
       minSeats,
       maxSeats,
     } = req.body;
+
     let filters = {
       where: {
         [Op.and]: [],
-        data: {},
       },
     };
+
     if (search) {
-      filters.where.data.name = {
-        [Op.iLike]: `%${search}%`,
-      };
+      filters.where[Op.or] = [
+        sequelize.where(sequelize.json('data.name'), Op.iLike, `%${search}%`),
+        sequelize.where(sequelize.json('data.location'), Op.iLike, `%${search}%`)
+      ];
+    }
+
+    if (ratings && ratings.length > 0) {
+      filters.where[Op.and].push({
+        [Op.or]: ratings.map((r) => ({
+          "data.ratings": r.toString()
+        }))
+      });
     }
 
     if (minFees) {
-      filters.where.data.fees = {
-        min: {
-          [Op.gt]: minFees,
-        },
-      };
+      filters.where[Op.and].push(
+        sequelize.where(sequelize.cast(sequelize.json('data.fees.min'), 'INTEGER'), Op.gte, minFees)
+      );
     }
     if (maxFees) {
-      if (filters.where.data?.fees) {
-        filters.where.data.fees.max = { [Op.lt]: maxFees };
-      } else {
-        filters.where.data.fees = {
-          max: {
-            [Op.lt]: maxFees,
-          },
-        };
-      }
+      filters.where[Op.and].push(
+        sequelize.where(sequelize.cast(sequelize.json('data.fees.max'), 'INTEGER'), Op.lte, maxFees)
+      );
     }
     if (minSeats) {
-      filters.where.data.seats = {
-        [Op.gt]: minSeats,
-      };
+      filters.where[Op.and].push(
+        sequelize.where(sequelize.cast(sequelize.json('data.seats'), 'INTEGER'), Op.gte, minSeats)
+      );
     }
     if (maxSeats) {
-      if (filters.where.data?.seats) {
-        filters.where.data.seats[Op.lte] = maxSeats;
-      } else {
-        filters.where.data.seats = {
-          [Op.lt]: maxSeats,
-        };
-      }
+      filters.where[Op.and].push(
+        sequelize.where(sequelize.cast(sequelize.json('data.seats'), 'INTEGER'), Op.lte, maxSeats)
+      );
     }
+
     if (specializations && specializations.length > 0) {
       filters.where[Op.and].push({
         [Op.or]: specializations.map((s) => ({
           "data.specialization": {
             [Op.iLike]: `%${s}%`,
-          }, // Match any date in the array
+          },
         })),
       });
     }
-    if (ratings && ratings.length > 0) {
-      filters.where[Op.and].push({
-        [Op.or]: ratings.map((r) => ({
-          "data.rating": {
-            [Op.iLike]: `%${r}%`,
-          }, // Match any date in the array
-        })),
-      });
-    }
+
     if (locations && locations.length > 0) {
       filters.where[Op.and].push({
         [Op.or]: locations.map((l) => ({
           "data.location": {
             [Op.iLike]: `%${l}%`,
-          }, // Match any date in the array
+          },
         })),
       });
     }
-    if (page) {
-      page = parseInt(page);
-    }
-    if (show) {
-      show = parseInt(show);
-    }
-    let coachings;
-    if (page && show) {
-      coachings = await Coaching.findAll({
-        ...filters,
-        offset: (page - 1) * show,
-        limit: show,
-      });
-    } else {
-      coachings = await Coaching.findAll({ ...filters });
-    }
-    const totalCount = await Coaching.count({ ...filters });
+
+    page = page ? parseInt(page) : 1;
+    show = show ? parseInt(show) : 10;
+
+    const { rows: coachings, count: totalCount } = await Coaching.findAndCountAll({
+      ...filters,
+      offset: (page - 1) * show,
+      limit: show,
+    });
+
     res.status(200).json({
       message: "All coachings retrieved successfully",
       coachings,
