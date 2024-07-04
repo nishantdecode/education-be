@@ -1,32 +1,23 @@
-const cloudinary = require("cloudinary").v2;
-const { Blog } = require("../models/blog");
-const { createBlog } = require("../models/blog");
-const { BlogInteraction } = require("../models/blogInteraction");
-const { Op } = require("sequelize");
 const moment = require("moment");
+const { Op } = require("sequelize");
 const { User } = require("../models/user");
+const { Blog, createBlog } = require("../models/blog");
+const { uploadFile } = require("../helper/cloudinaryHelper");
+const { BlogInteraction } = require("../models/blogInteraction");
 
 const createAdd = async (req, res) => {
   const { userId, title, owner, description, ownerUrl, tags } = req.body;
-  console.log("Uploaded Image File:", req.file);
 
   if (!req.file) {
     return res.status(400).json({ message: "No image file provided" });
   }
-
-  console.log(req.body)
+  console.log(req.body);
   try {
-    // Convert tags from a comma-separated string to an array of tags
     const tagArray = tags.split(",").map((tag) => tag.trim());
 
-    const b64 = Buffer.from(req.file.buffer).toString("base64");
-    let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: "edmertion",
-    });
+    const result = await uploadFile(req.file);
 
-    console.log(result.url)
-
+    console.log(result);
     const blog = await createBlog({
       userId,
       title,
@@ -37,14 +28,11 @@ const createAdd = async (req, res) => {
       tags: tagArray,
     });
 
-    // Update user's usedTags
     const user = await User.findOne({ where: { userId } });
-    console.log("user",user)
 
     if (user) {
       const userTags = user.usedTags ? user.usedTags.split(",") : [];
 
-      // Add new tags to user's usedTags
       tagArray.forEach((tag) => {
         if (!userTags.includes(tag)) {
           userTags.push(tag);
@@ -154,24 +142,21 @@ const getAllBlogsCurrentMonth = async (req, res) => {
       order: [["likes", "DESC"]], // Order by likes in descending order
     });
 
-    res
-      .status(200)
-      .json({
-        message: "Blogs of the current month retrieved successfully",
-        blogs,
-      });
+    res.status(200).json({
+      message: "Blogs of the current month retrieved successfully",
+      blogs,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving blogs of the current month",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving blogs of the current month",
+      error: error.message,
+    });
   }
 };
 
-const getAllBlogsByClicks = async (req, res) => {
+const getPopularBloggers = async (req, res) => {
   try {
+    console.log("test");
     const blogs = await Blog.findAll({
       include: [
         {
@@ -186,18 +171,28 @@ const getAllBlogsByClicks = async (req, res) => {
           ],
         },
       ],
-      order: [["clicks", "DESC"]], // Order by clicks in descending order
+      order: [["clicks", "DESC"]],
     });
-    res
-      .status(200)
-      .json({ message: "All blogs retrieved by clicks successfully", blogs });
+
+    const uniqueUsersMap = new Map();
+
+    blogs.forEach((blog) => {
+      if (blog.User) {
+        uniqueUsersMap.set(blog.User.userId, blog.User);
+      }
+    });
+
+    const uniqueUsers = Array.from(uniqueUsersMap.values());
+
+    res.status(200).json({
+      message: "All blogs retrieved by clicks successfully",
+      users: uniqueUsers,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving blogs by clicks",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving blogs by clicks",
+      error: error.message,
+    });
   }
 };
 
@@ -260,7 +255,7 @@ const likeDislikeBlog = async (req, res, interactionType) => {
     // Check if the user has already interacted with the blog
     const existingInteraction = await BlogInteraction.findOne({
       where: {
-        UserId: userId,
+        userId: userId,
         BlogId: blogId,
       },
     });
@@ -290,7 +285,7 @@ const likeDislikeBlog = async (req, res, interactionType) => {
     } else {
       // User is interacting for the first time
       await BlogInteraction.create({
-        UserId: userId,
+        userId: userId,
         BlogId: blogId,
         interactionType,
       });
@@ -351,23 +346,21 @@ const getLikesDislikesCount = async (req, res) => {
 
     res.status(200).json({ totalLikes, totalDislikes });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving likes and dislikes count",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving likes and dislikes count",
+      error: error.message,
+    });
   }
 };
 
-const getLastInteraction = async (req, res) => {
+const getInteraction = async (req, res) => {
   const { id } = req.params;
-  const userId = req.body.userId;
+  const { userId } = req.body;
 
   try {
     const lastInteraction = await BlogInteraction.findOne({
       where: {
-        UserId: userId,
+        userId: userId,
         BlogId: id,
       },
       order: [["createdAt", "DESC"]],
@@ -375,12 +368,10 @@ const getLastInteraction = async (req, res) => {
 
     res.status(200).json({ lastInteraction });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving last interaction",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving last interaction",
+      error: error.message,
+    });
   }
 };
 
@@ -416,12 +407,10 @@ const getBlogsByUserId = async (req, res) => {
 
     res.status(200).json({ message: "Blogs retrieved successfully", blogs });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving blogs by userId",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error retrieving blogs by userId",
+      error: error.message,
+    });
   }
 };
 
@@ -435,8 +424,8 @@ module.exports = {
   dislikeBlog,
   trackClick,
   getLikesDislikesCount,
-  getLastInteraction,
+  getInteraction,
   getAllBlogsCurrentMonth,
-  getAllBlogsByClicks,
+  getPopularBloggers,
   getBlogsByUserId,
 };

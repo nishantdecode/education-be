@@ -14,7 +14,7 @@ const College = sequelize.define(
       allowNull: true,
     },
     course_data: {
-      type: DataTypes.ARRAY(DataTypes.JSONB),
+      type: DataTypes.JSONB,
       allowNull: false,
       defaultValue: [],
     },
@@ -38,7 +38,6 @@ const College = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-  
     rating: {
       type: DataTypes.FLOAT,
       allowNull: false,

@@ -1,4 +1,3 @@
-// controllers/courseController.js
 const { Course, createCourse } = require("../models/course");
 const excelToJson = require("convert-excel-to-json");
 const fs = require("fs");
@@ -226,58 +225,58 @@ const importCourseData = async (req, res) => {
 //
 const getAllCourses = async (req, res) => {
   try {
-    let { page, show,search } = req.query;
-    let {languages,minFees,maxFees,modes,platforms} = req.body;
+    let { page, show, search } = req.query;
+    let { languages, minFees, maxFees, modes, platforms } = req.body;
     const filters = {
       where: {
-        [Op.and]:[]
+        [Op.and]: [],
       },
-    }
+    };
 
-    if(search){
-      filters.where.title ={
-        [Op.iLike]: `%${search}%` 
-      }
+    if (search) {
+      filters.where.title = {
+        [Op.iLike]: `%${search}%`,
+      };
     }
-    if(modes && modes.length>0){
+    if (modes && modes.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: modes.map(md => ({
-          'mode': {
-            [Op.iLike]: `%${md}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: modes.map((md) => ({
+          mode: {
+            [Op.iLike]: `%${md}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-    if(platforms && platforms.length>0){
+    if (platforms && platforms.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: platforms.map(p => ({
-          'platform': {
-            [Op.iLike]: `%${p}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: platforms.map((p) => ({
+          platform: {
+            [Op.iLike]: `%${p}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
-    if(languages && languages.length>0){
+    if (languages && languages.length > 0) {
       filters.where[Op.and].push({
-        [Op.or]: languages.map(lng => ({
-          'language': {
-            [Op.iLike]: `%${lng}%`
-          } // Match any date in the array
-        }))
-      })
+        [Op.or]: languages.map((lng) => ({
+          language: {
+            [Op.iLike]: `%${lng}%`,
+          }, // Match any date in the array
+        })),
+      });
     }
 
     if (minFees) {
       filters.where.price = {
-        [Op.gt]: minFees,
+        [Op.gte]: minFees,
       };
     }
     if (maxFees) {
       if (filters.where.price) {
-        filters.where.price[Op.lt] = maxFees;
+        filters.where.price[Op.lte] = maxFees;
       } else {
         filters.where.price = {
-          [Op.lt]: maxFees,
+          [Op.lte]: maxFees,
         };
       }
     }
@@ -295,9 +294,9 @@ const getAllCourses = async (req, res) => {
         limit: show,
       });
     } else {
-      courses = await Course.findAll({...filters});
+      courses = await Course.findAll({ ...filters });
     }
-    const totalCount = await Course.count({...filters});
+    const totalCount = await Course.count({ ...filters });
 
     res.status(200).json({
       message: "All courses retrieved successfully",
@@ -315,17 +314,21 @@ const getAllCourses = async (req, res) => {
 
 const getFilterData = async (req, res) => {
   try {
-    const filterData = await Course.aggregate('platform', 'DISTINCT', { plain: false });
-    const platforms = filterData.map(item => item.DISTINCT);
-    
-    const languages = await Course.aggregate('language', 'DISTINCT', { plain: false });
-    const languagesList = languages.map(item => item.DISTINCT);
+    const filterData = await Course.aggregate("platform", "DISTINCT", {
+      plain: false,
+    });
+    const platforms = filterData.map((item) => item.DISTINCT);
 
-    const modes = await Course.aggregate('mode', 'DISTINCT', { plain: false });
-    const modesList = modes.map(item => item.DISTINCT);
+    const languages = await Course.aggregate("language", "DISTINCT", {
+      plain: false,
+    });
+    const languagesList = languages.map((item) => item.DISTINCT);
 
-    const minPrice = await Course.min('price');
-    const maxPrice = await Course.max('price');
+    const modes = await Course.aggregate("mode", "DISTINCT", { plain: false });
+    const modesList = modes.map((item) => item.DISTINCT);
+
+    const minPrice = await Course.min("price");
+    const maxPrice = await Course.max("price");
 
     // Construct the response object
     const filterObject = {
@@ -333,9 +336,11 @@ const getFilterData = async (req, res) => {
       languages: languagesList,
       modes: modesList,
       minPrice,
-      maxPrice
+      maxPrice,
     };
-    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+    res
+      .status(200)
+      .json({ message: "Filter data retrieved successfully", filterObject });
   } catch (error) {
     res
       .status(500)

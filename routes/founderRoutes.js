@@ -1,4 +1,3 @@
-// routes/videoRoutes.js
 const express = require('express');
 const router = express.Router();
 const founderController = require('../controllers/founderController');

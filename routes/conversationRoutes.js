@@ -5,4 +5,4 @@ const conversationController = require('../controllers/conversationController');
 router.post('/', conversationController.getConversations);
 router.post('/create', conversationController.create);
 
-module.exports = router;
+module.exports = router

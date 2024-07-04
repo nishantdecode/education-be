@@ -1,6 +1,3 @@
-// const AWS = require('aws-sdk');
-// const nodemailer = require('nodemailer')
-
 const nodemailer = require("nodemailer");
 const prodApiKey = process.env.BREVO_API_KEY;
 const sendinBlueTransport = require("nodemailer-sendinblue-transport");

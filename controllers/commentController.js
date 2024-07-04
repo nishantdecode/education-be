@@ -2,7 +2,6 @@ const { Comment, createComment } = require("../models/comment");
 const { CommentInteraction } = require("../models/commentInteraction");
 const { CommentReport } = require("../models/commentReport");
 const { User } = require("../models/user");
-const { Blog } = require("../models/blog");
 
 const create = async (req, res) => {
   const { text, userId } = req.body;
@@ -24,55 +23,62 @@ const create = async (req, res) => {
 };
 
 const getCommentsForBlog = async (req, res) => {
-  const blogId = req.params.id; // Assuming the blog id is available in the request
+  const blogId = req.params.id;
   const userId = req.body.userId;
+
   try {
     let comments;
+
     if (userId) {
       comments = await Comment.findAll({
-        where: {
-          BlogId: blogId,
-        },
+        where: { BlogId: blogId },
         include: [
           {
             model: User,
             attributes: [
               "userId",
               "firstName",
+              "lastName",
               "email",
               "mobile",
-              "lastName",
               "profileImageUrl",
             ],
           },
           {
             model: CommentInteraction,
-            where: {
-              UserId: userId,
-            },
+            where: { userId: userId },
+            required: false,
             order: [["createdAt", "DESC"]],
             limit: 1,
-            // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
           },
           {
             model: CommentReport,
-            where: {
-              UserId: userId,
-            },
+            where: { userId: userId },
+            required: false,
             order: [["createdAt", "DESC"]],
             limit: 1,
-            // attributes: ['userId', 'firstName','email','mobile','lastName','profileImageUrl'],
           },
         ],
-      
       });
-    }else{
+    } else {
       comments = await Comment.findAll({
-        where: {
-          BlogId: blogId,
-        },
+        where: { BlogId: blogId },
+        include: [
+          {
+            model: User,
+            attributes: [
+              "userId",
+              "firstName",
+              "lastName",
+              "email",
+              "mobile",
+              "profileImageUrl",
+            ],
+          },
+        ],
       });
     }
+
     res
       .status(200)
       .json({ message: "Comments retrieved successfully", comments });
@@ -96,8 +102,8 @@ const likeDislikeComment = async (req, res, interactionType) => {
     // Check if the user has already interacted with the comment
     const existingInteraction = await CommentInteraction.findOne({
       where: {
-        UserId: userId,
-        CommentId: commentId,
+        userId: userId,
+        commentId: commentId,
       },
     });
 
@@ -123,8 +129,8 @@ const likeDislikeComment = async (req, res, interactionType) => {
       }
     } else {
       await CommentInteraction.create({
-        UserId: userId,
-        CommentId: commentId,
+        userId: userId,
+        commentId: commentId,
         interactionType,
       });
 
@@ -157,8 +163,8 @@ const getLastInteraction = async (req, res) => {
   try {
     const lastInteraction = await CommentInteraction.findOne({
       where: {
-        UserId: userId,
-        CommentId: id,
+        userId: userId,
+        commentId: id,
       },
       order: [["createdAt", "DESC"]],
     });
@@ -183,8 +189,8 @@ const reportComment = async (req, res) => {
 
     // Create a report for the comment without requiring a reason
     await CommentReport.create({
-      CommentId: commentId,
-      UserId: userId,
+      commentId: commentId,
+      userId: userId,
     });
 
     res.status(201).json({ message: "Comment reported successfully" });

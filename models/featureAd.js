@@ -20,7 +20,7 @@ const FeatureAd = sequelize.define('FeatureAd', {
         allowNull: false,
     },
     type: {
-        type: DataTypes.ENUM('course', 'college', 'scholarship', 'loan', 'coaching', 'all'), // Define the ENUM data type with possible values
+        type: DataTypes.ENUM('course', 'college', 'coaching', 'scholarship', 'loan', 'all'), // Define the ENUM data type with possible values
         allowNull: false,
     }
 }, {

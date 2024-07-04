@@ -1,4 +1,3 @@
-// controllers/collegeController.js
 const { College, createCollege } = require("../models/college");
 const data1 = require("../data/college_data_final1.json");
 const data2 = require("../data/college_data_final2.json");
@@ -45,7 +44,7 @@ const importCollegeData = async (req, res) => {
       if (review) {
         review = parseInt(review.split(" ")[0].trim().substr(1));
       }
-      console.log({course:college.course_info});
+      console.log({ course: college.course_info });
       // result.push();
       await createCollege({
         name: college.clgname,
@@ -74,6 +73,7 @@ const getAllColleges = async (req, res) => {
     let { page, show, search } = req.query;
     let { locations, minFees, maxFees, courses, ratings } = req.body;
 
+    console.log(ratings);
     minFees = minFees ? parseInt(minFees, 10) : null;
     maxFees = maxFees ? parseInt(maxFees, 10) : null;
 
@@ -90,11 +90,10 @@ const getAllColleges = async (req, res) => {
         },
         location: {
           [Op.iLike]: `%${search}%`,
-        }
+        },
         // Add more columns as needed
       };
     }
-    
 
     if (courses && courses.length > 0) {
       const courseFilters = courses.map((md) => ({
@@ -116,28 +115,34 @@ const getAllColleges = async (req, res) => {
 
     if (minFees !== null) {
       filters.where.fees = {
-        [Op.gt]: minFees,
+        [Op.gte]: minFees,
       };
     }
 
     if (maxFees !== null) {
       if (filters.where.fees) {
-        filters.where.fees[Op.lt] = maxFees;
+        filters.where.fees[Op.lte] = maxFees;
       } else {
         filters.where.fees = {
-          [Op.lt]: maxFees,
+          [Op.lte]: maxFees,
         };
       }
     }
 
     if (ratings && ratings.length > 0) {
-      const ratingFilters = ratings.map((r) => ({
-        rating: r,
-      }));
-    
+      const ratingFilters = ratings.map((r) => {
+        const rating = parseFloat(r);
+        console.log(rating)
+        return {
+          rating: {
+            [Op.gte]: parseFloat(rating),
+            [Op.lt]: parseFloat(rating + 1),
+          },
+        };
+      });
+
       filters.where[Op.and].push({ [Op.or]: ratingFilters });
     }
-    
 
     if (page) {
       page = parseInt(page);
@@ -145,7 +150,7 @@ const getAllColleges = async (req, res) => {
     if (show) {
       show = parseInt(show);
     }
-    
+
     let colleges;
     if (page && show) {
       colleges = await College.findAll({
@@ -167,29 +172,37 @@ const getAllColleges = async (req, res) => {
       totalCount: totalCount,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving colleges", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error retrieving colleges", error: error.message });
   }
 };
 
 const getFilterData = async (req, res) => {
   try {
-    const filterData = await College.aggregate('location', 'DISTINCT', { plain: false });
-    const locations = filterData.map(item => item.DISTINCT);
-    
-    const courses = await College.aggregate('course', 'DISTINCT', { plain: false });
-    const coursesList = courses.map(item => item.DISTINCT);
+    const filterData = await College.aggregate("location", "DISTINCT", {
+      plain: false,
+    });
+    const locations = filterData.map((item) => item.DISTINCT);
 
-    const minPrice = await College.min('fees');
-    const maxPrice = await College.max('fees');
+    const courses = await College.aggregate("course", "DISTINCT", {
+      plain: false,
+    });
+    const coursesList = courses.map((item) => item.DISTINCT);
+
+    const minPrice = await College.min("fees");
+    const maxPrice = await College.max("fees");
 
     // Construct the response object
     const filterObject = {
       locations,
       courses: coursesList,
       minPrice,
-      maxPrice
+      maxPrice,
     };
-    res.status(200).json({ message: "Filter data retrieved successfully", filterObject });
+    res
+      .status(200)
+      .json({ message: "Filter data retrieved successfully", filterObject });
   } catch (error) {
     res
       .status(500)
@@ -233,7 +246,6 @@ const updateCollege = async (req, res) => {
       .json({ message: "Error updating college", error: error.message });
   }
 };
-
 
 const deleteCollege = async (req, res) => {
   const { id } = req.params;

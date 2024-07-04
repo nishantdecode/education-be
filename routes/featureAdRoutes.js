@@ -1,4 +1,3 @@
-// routes/featureAdRoutes.js
 const express = require('express');
 const router = express.Router();
 const featureAdController = require('../controllers/featureAdController');

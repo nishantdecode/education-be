@@ -27,6 +27,6 @@ const submitForm = async (formData) => {
 };
 
 module.exports = {
-    Newsletter, // Export the Form model itself
-    submitForm, // Export the submitForm function
+    Newsletter,
+    submitForm,
 };

@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const { instance } = require("../config/razorpay.js");
 const { Order } = require("../models/order");
-const { Slot } = require("../models/slot");
 
 const getAllUserOrders = async (req, res) => {
   const { userId } = req.params;
@@ -12,13 +11,12 @@ const getAllUserOrders = async (req, res) => {
     });
 
     if (!orders.length) {
-      return res.status(404).json({ message: 'No orders found for this user' });
+      return res.status(404).json({ message: "No orders found for this user" });
     }
 
     return res.status(200).json(orders);
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -28,16 +26,14 @@ const getOrder = async (req, res) => {
   try {
     const order = await Order.findByPk(orderId);
 
-    console.log(orderId, order)
 
     if (!order) {
-      return res.status(404).json({ message: 'No order found' });
+      return res.status(404).json({ message: "No order found" });
     }
 
     return res.status(200).json(order);
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -55,8 +51,8 @@ const checkout = async (req, res) => {
     slotId: req.body.slotId,
     amount: req.body.amount,
     currency: "INR",
-    status: "Pending"
-  })
+    status: "Pending",
+  });
 
   res.status(200).json({
     success: true,
@@ -83,36 +79,27 @@ const paymentVerification = async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.status(404).json({ error: "Order not found" });
     }
 
     order.razorpay_payment_id = razorpay_payment_id;
     order.razorpay_signature = razorpay_signature;
-    order.status = 'Successful';
+    order.status = "Successful";
 
     await order.save();
-
-    const slot = await Slot.findOne({
-      where: { id : order.slotId },
-    });
-
-    slot.status = "Booked"
-    slot.bookingUserId = order.userId
-
-    await slot.save();
 
     res.redirect(
       `http://localhost:3000/chatting/paymentStatus?status=successful&orderId=${order.id}`
     );
   } else {
     const { error } = req.body;
-    const metadata = JSON.parse(error['error[metadata]']);
+    const metadata = JSON.parse(error["error[metadata]"]);
     const { payment_id, order_id } = metadata;
     const order = await Order.findOne({
-      where: { razorpay_order_id : order_id },
+      where: { razorpay_order_id: order_id },
     });
     order.razorpay_payment_id = payment_id;
-    order.status = 'Failed';
+    order.status = "Failed";
     await order.save();
     res.redirect(
       `http://localhost:3000/chatting/paymentStatus?status=failed&orderId=null`
@@ -125,17 +112,17 @@ const invoice = async (req, res) => {
   try {
     const order = await Order.findByPk(orderId);
     if (!order) {
-      return res.status(404).send('Order not found');
+      return res.status(404).send("Order not found");
     }
 
     const doc = generateInvoice(order);
-    const pdfData = doc.output('blob');
+    const pdfData = doc.output("blob");
 
-    res.setHeader('Content-disposition', 'attachment; filename=invoice.pdf');
-    res.setHeader('Content-type', 'application/pdf');
+    res.setHeader("Content-disposition", "attachment; filename=invoice.pdf");
+    res.setHeader("Content-type", "application/pdf");
     res.send(pdfData);
   } catch (error) {
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 };
 

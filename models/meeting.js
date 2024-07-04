@@ -14,9 +14,6 @@ const Meeting = sequelize.define(
     userId: {
       type: DataTypes.STRING,
     },
-    date: {
-      type: DataTypes.DATE,
-    },
     startTime: {
       type: DataTypes.DATE,
     },

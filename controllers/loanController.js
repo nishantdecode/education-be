@@ -16,17 +16,17 @@ const create = async (req, res) => {
 // Get all loans
 const getAllLoans = async (req, res) => {
   try {
-    let { page, show,search } = req.query;
+    let { page, show, search } = req.query;
     let { minRate, maxRate, minLoan, maxLoan } = req.body;
     let filters = {
       where: {
         data: {},
       },
     };
-    if(search){
-      filters.where.data.name ={
-        [Op.iLike]: `%${search}%` 
-      }
+    if (search) {
+      filters.where.data.name = {
+        [Op.iLike]: `%${search}%`,
+      };
     }
     if (minLoan) {
       filters.where.data.amount = {
@@ -74,9 +74,9 @@ const getAllLoans = async (req, res) => {
         limit: show,
       });
     } else {
-      loans = await Loan.findAll({...filters});
+      loans = await Loan.findAll({ ...filters });
     }
-    const totalCount = await Loan.count({...filters});
+    const totalCount = await Loan.count({ ...filters });
 
     res.status(200).json({
       message: "All loans retrieved successfully",

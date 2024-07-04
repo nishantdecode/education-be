@@ -1,4 +1,3 @@
-// routes/coachingRoutes.js
 const express = require('express');
 const router = express.Router();
 const coachingController = require('../controllers/coachingController');

@@ -1,39 +1,21 @@
-const cloudinary = require('cloudinary').v2;
+const multer = require("multer");
 const router = require("express").Router();
-const multer = require('multer');
+const { uploadFile } = require("../helper/cloudinaryHelper");
 
-// Configure Cloudinary
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Set up multer storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage }).single('file');
-const { Readable } = require('stream');
+const upload = multer({ storage: storage }).single("file");
 
-async function handleUpload(file) {
-  const res = await cloudinary.uploader.upload(file, {
-    resource_type: "auto",
-  });
-  return res;
-}
 router.post("/single", upload, async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ message: "No file uploaded" });
     }
-    const b64 = Buffer.from(req.file.buffer).toString("base64");
-    let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-    const cldRes = await handleUpload(dataURI);
-  
-    // Send the file URL in the response
-    res.json({ fileUrl: cldRes.url });
+    const result = await uploadFile(req.file);
+
+    res.json({ fileUrl: result.url });
   } catch (error) {
-    console.error('Error uploading file to Cloudinary:', error);
-    res.status(500).json({ message: 'Error uploading file' });
+    console.error("Error uploading file to Cloudinary:", error);
+    res.status(500).json({ message: "Error uploading file" });
   }
 });
 

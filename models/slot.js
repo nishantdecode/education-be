@@ -4,14 +4,6 @@ const sequelize = require("../config/db");
 const Slot = sequelize.define(
   "Slot",
   {
-    startDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    endDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
     startTime: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -32,10 +24,7 @@ const Slot = sequelize.define(
       type: DataTypes.STRING,
     },
     status: {
-      type: DataTypes.ENUM(
-        "Booked",
-        "Available"
-      ),
+      type: DataTypes.ENUM("Booked", "Available"),
       defaultValue: "Available",
       allowNull: false,
     },

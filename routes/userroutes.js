@@ -19,33 +19,22 @@ const {
     getAllUsers
 } = require('../controllers/userController');
 
-// Send OTP route
-router.post('/sendotp', sendOtp);
-router.post('/sendotptest', sendOtptest);
-// Verify OTP route
-router.post('/verifyotp', verifyOtp);
-
-// Signup route
-router.post('/signup', signup);
-
-// Login with mobile & OTP route
+router.post('/sendOtp', sendOtp);
+router.post('/verifyOtp', verifyOtp);
 router.post('/login/mobile', loginWithMobileAndOtp);
-
-// Login with email & OTP route
 router.post('/login/email', loginWithEmailAndOtp);
 
-router.put('/update-user', updateUserDetails); // Requires authentication
+router.post('/signup', signup);
 
-router.get('/user/:userId', getUserDataByUserId); // Retrieve user data by userID
+router.put('/update-user', updateUserDetails);
+router.get('/user/:userId', getUserDataByUserId);
 router.get('/', getAllUsers);
 router.get('/user/:userId/info', getUserDataWithInfoPercentage);
-
-router.get('/count', getUsersCountByCountry); // Retrieve user count
+router.get('/count', getUsersCountByCountry);
 
 router.post('/request-verification/:userId', requestVerificationTag);
 router.put('/approve-verification/:requestId', approveVerificationTag);
 router.put('/reject-verification/:requestId', rejectVerificationTag);
-
 router.get('/tags-and-blogs', getUserTagsAndBlogs);
 
 module.exports = router;

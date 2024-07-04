@@ -4,7 +4,6 @@ const { Op } = require("sequelize");
 const create = async (req, res) => {
   try {
     let slots = [];
-    console.log('Request body:', req.body);
 
     if (req.body.slots) {
       slots = [...req.body.slots];
@@ -22,16 +21,16 @@ const create = async (req, res) => {
           where: {
             [Op.or]: [
               {
-                startTime: { [Op.gte]: startTime },
-                endTime: { [Op.lte]: endTime },
+                startTime: { [Op.between]: [startTime, endTime] },
               },
               {
-                startTime: { [Op.gte]: endTime },
-                endTime: { [Op.lte]: endTime },
+                endTime: { [Op.between]: [startTime, endTime] },
               },
               {
-                startTime: { [Op.lte]: startTime },
-                endTime: { [Op.gte]: endTime },
+                [Op.and]: [
+                  { startTime: { [Op.lte]: startTime } },
+                  { endTime: { [Op.gte]: endTime } },
+                ],
               },
             ],
           },
@@ -50,15 +49,11 @@ const create = async (req, res) => {
 
     const promises = [];
     for (let slot of slots) {
-      const startDate = new Date(slot.startDate).toISOString();
-      const endDate = new Date(slot.endDate).toISOString();
       const startTime = new Date(slot.startTime).toISOString();
       const endTime = new Date(slot.endTime).toISOString();
 
       promises.push(
         Slot.create({
-          startDate: startDate,
-          endDate: endDate,
           startTime: startTime,
           endTime: endTime,
           status: "Available",
@@ -69,27 +64,22 @@ const create = async (req, res) => {
     }
 
     try {
-      await Promise.all(promises);
-      console.log('Slots successfully created');
+      const slots = await Promise.all(promises);
       res.send({ message: "Successfully created" });
     } catch (error) {
-      console.log('Error during slot creation:', error);
       res.status(500).send({ error: error.message });
     }
-
   } catch (error) {
-    console.log('Error processing request:', error);
     res.status(500).send({ error: error.message });
   }
 };
 
-
 const getAllSlots = async (req, res) => {
   try {
-    const slot = await Slot.findAll();
+    const slots = await Slot.findAll();
     res.status(200).json({
       message: "All slots retrieved successfully",
-      slot,
+      slots,
     });
   } catch (error) {
     res
@@ -102,7 +92,6 @@ const getSlot = async (req, res) => {
   const { slotId } = req.params;
   try {
     const slot = await Slot.findByPk(slotId);
-    console.log(slot)
     res.status(200).json({
       message: "Slot retrieved successfully",
       slot,
@@ -115,26 +104,21 @@ const getSlot = async (req, res) => {
 };
 
 const getAllSlotsByDate = async (req, res) => {
-  const { date } = req.body;
+  const { startDate, endDate } = req.body;
 
+  console.log("Test---------------------------------------------")
+  console.log(startDate, endDate)
   try {
-    // Parse the date and set it to the start of the day in UTC
-    const parsedDate = new Date(date);
-    const startOfDay = new Date(Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate()));
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
-
     const slots = await Slot.findAll({
       where: {
-        startDate: { 
-          [Op.gte]: startOfDay,
-          [Op.lt]: endOfDay
-        }
+        startTime: {
+          [Op.gte]: startDate,
+          [Op.lt]: endDate,
+        },
       },
     });
 
-    console.log(slots);
-
+    console.log(slots)
     if (!slots || slots.length === 0) {
       return res.status(404).json({ message: "Slots not found" });
     }

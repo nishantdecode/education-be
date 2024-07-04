@@ -24,10 +24,6 @@ const News = sequelize.define('News', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  // type: {
-  //   type: DataTypes.STRING,
-  //   allowNull: true,
-  // },
 }, {
   tableName: 'Newss',
 });

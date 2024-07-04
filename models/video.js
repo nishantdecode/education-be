@@ -1,40 +1,48 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
 
-const Video = sequelize.define('Video', {
+const Video = sequelize.define(
+  "Video",
+  {
     id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
     },
     title: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     thumbnailUrl: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     videoUrl: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-}, {
-    tableName: 'videos', // Explicitly set the table name to 'videos'
-});
+  },
+  {
+    tableName: "Videos",
+  }
+);
 
 const createVideo = async (videoData) => {
-    try {
-        const video = await Video.create(videoData);
-        return video;
-    } catch (error) {
-        console.error('Validation error details:', error);
-        throw new Error(error.message);
-    }
+  try {
+    const video = await Video.create(videoData);
+    return video;
+  } catch (error) {
+    console.error("Validation error details:", error);
+    throw new Error(error.message);
+  }
 };
 
 module.exports = {
-    Video, // Export the Video model itself
-    createVideo
+  Video, // Export the Video model itself
+  createVideo,
 };

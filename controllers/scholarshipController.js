@@ -20,15 +20,14 @@ const getAllScholarships = async (req, res) => {
   try {
     let { page, show, search } = req.query;
     let {
-      minAmount,
-      maxAmount,
+      price : [minAmount, maxAmount],
       "scholarship type": type,
       "offered by": offeredBy,
       "intake year": inTakeYear,
       minDeadLine,
       maxDeadLine,
     } = req.body;
-    console.log(type, offeredBy, inTakeYear);
+
     let filters = {
       where: {
         [Op.and]: [],
@@ -43,17 +42,27 @@ const getAllScholarships = async (req, res) => {
 
     if (minAmount) {
       filters.where.data.amount = {
-        [Op.gt]: minAmount,
+        [Op.gte]: minAmount,
       };
     }
     if (maxAmount) {
       if (filters.where.data?.amount) {
-        filters.where.data.amount[Op.lt] = maxAmount;
+        filters.where.data.amount[Op.lte] = maxAmount;
       } else {
         filters.where.data.amount = {
-          [Op.lt]: maxAmount,
+          [Op.lte]: maxAmount,
         };
       }
+    }
+
+    if (type && type.length > 0) {
+      filters.where[Op.and].push({
+        [Op.or]: type.map((item) => ({
+          "data.eligibility": {
+            [Op.iLike]: `%${item}%`,
+          },
+        })),
+      });
     }
 
     if (inTakeYear && inTakeYear.length > 0) {
@@ -61,19 +70,21 @@ const getAllScholarships = async (req, res) => {
         [Op.or]: inTakeYear.map((year) => ({
           "data.forYear": {
             [Op.iLike]: `%${year}%`,
-          }, // Match any date in the array
+          },
         })),
       });
     }
+
     if (offeredBy && offeredBy.length > 0) {
       filters.where[Op.and].push({
         [Op.or]: offeredBy.map((offer) => ({
-          "data.eligibility": {
+          "data.organization": {
             [Op.iLike]: `%${offer}%`,
           }, // Match any date in the array
         })),
       });
     }
+
     if (minDeadLine) {
       filters.where.data.importantDates = {
         ["submission Date"]: {

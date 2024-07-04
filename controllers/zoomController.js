@@ -1,17 +1,29 @@
 const { createZoomMeeting, listZoomMeetings } = require("../api/zoomAPI.js");
 const { Meeting } = require("../models/meeting");
+const { Slot } = require("../models/slot.js");
 const { User } = require("../models/user");
 const { Op } = require("sequelize");
 
-const CreateAppointment = async (req, res) => {
-  const { type, userId, email, date, startTime, endTime, topic, slotId } =
-    req.body;
+const createAppointment = async (req, res) => {
+  const { type, userId, email, startTime, endTime, topic, slotId } = req.body;
 
   try {
-    if (!type) {
-      res.status(400);
-      throw new Error("Please Fill all the fields");
-    } else {
+    if (
+      !type ||
+      !userId ||
+      !email ||
+      !startTime ||
+      !endTime ||
+      !topic ||
+      !slotId
+    ) {
+      res.status(400).json({ message: "Please fill all the fields" });
+      return;
+    }
+
+    const slotFetched = await Slot.findByPk(slotId);
+
+    if (slotFetched.status === "Available") {
       const zoomMeeting = await createZoomMeeting(
         type,
         email,
@@ -24,15 +36,30 @@ const CreateAppointment = async (req, res) => {
           topic,
           slotId,
           userId,
-          date,
           startTime,
           endTime,
           hostLink: zoomMeeting.start_url,
           attendeeLink: zoomMeeting.join_url,
+          status: "Join",
         });
-      }
 
-      res.status(201).json(zoomMeeting);
+        const slot = await Slot.findOne({
+          where: { id: order.slotId },
+        });
+
+        slot.status = "Booked";
+        slot.bookingUserId = order.userId;
+
+        await slot.save();
+
+        res.status(201).json(zoomMeeting);
+        return;
+      } else {
+        throw new Error("Zoom meeting creation failed");
+      }
+    } else {
+      res.status(400).json({ message: "Slot already booked" });
+      return;
     }
   } catch (error) {
     console.error("Error creating meeting:", error);
@@ -42,7 +69,7 @@ const CreateAppointment = async (req, res) => {
   }
 };
 
-const ListMeeting = async (req, res) => {
+const listMeeting = async (req, res) => {
   try {
     const meetings = await listZoomMeetings();
     if (meetings === undefined) {
@@ -52,7 +79,6 @@ const ListMeeting = async (req, res) => {
       res.status(201).json({ meetings });
     }
   } catch (error) {
-    console.error("Error listing meeting:", error);
     res
       .status(500)
       .json({ message: "Error listing meeting", error: error.message });
@@ -77,7 +103,7 @@ const getMeeting = async (req, res) => {
       meeting = await Meeting.findOne({
         where: { userId },
       });
-    } else if(startDate) {
+    } else if (startDate) {
       const date = new Date(startDate);
       const startOfDay = new Date(date.setHours(0, 0, 0, 0));
       const endOfDay = new Date(date.setHours(23, 59, 59, 999));
@@ -87,6 +113,9 @@ const getMeeting = async (req, res) => {
           startTime: {
             [Op.gte]: startOfDay,
             [Op.lt]: endOfDay,
+          },
+          status: {
+            [Op.ne]: "Expired",
           },
         },
         include: [
@@ -102,11 +131,9 @@ const getMeeting = async (req, res) => {
             ],
           },
         ],
-        order: [["startTime", "ASC"]], 
+        order: [["startTime", "ASC"]],
       });
     }
-
-    console.log(meeting);
 
     if (!meeting) {
       return res.status(404).json({ message: "No meeting found" });
@@ -114,7 +141,6 @@ const getMeeting = async (req, res) => {
 
     return res.status(200).json(meeting);
   } catch (error) {
-    console.error("Error listing meeting:", error);
     res
       .status(500)
       .json({ message: "Error listing meeting", error: error.message });
@@ -123,30 +149,82 @@ const getMeeting = async (req, res) => {
 
 const latestMeeting = async (req, res) => {
   const { userId } = req.query;
-  console.log(userId)
+  const { startDate } = req.body;
+  const currentDateStart = new Date(startDate).toISOString();
 
   try {
     let meeting = await Meeting.findOne({
-      where: { userId },
-      order: [['createdAt', 'DESC']],
+      where: {
+        userId,
+        startTime: {
+          [Op.gte]: [currentDateStart],
+        },
+        status: {
+          [Op.ne]: "Expired",
+        },
+      },
+      order: [["createdAt", "DESC"]],
     });
 
     if (!meeting) {
-      return res.status(404).json({ message: "No meeting found" });
+      return res.status(404).json({ message: "No meeting found for today" });
     }
 
     return res.status(200).json(meeting);
   } catch (error) {
-    console.error("Error listing meeting:", error);
     res
       .status(500)
       .json({ message: "Error listing meeting", error: error.message });
   }
 };
 
+const updateMeeting = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const meeting = await Meeting.findByPk(id);
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    meeting.status = "Joined";
+
+    await meeting.save();
+
+    res.status(200).json({ message: "Meeting updated successfully", meeting });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating meeting", error: error.message });
+  }
+};
+
+const deleteMeeting = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const meeting = await Meeting.findByPk(id);
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    meeting.status = "Expired";
+
+    await meeting.save();
+
+    res.status(200).json({ message: "Meeting deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting meeting", error: error.message });
+  }
+};
+
 module.exports = {
-  CreateAppointment,
-  ListMeeting,
+  createAppointment,
+  listMeeting,
   getMeeting,
-  latestMeeting
+  latestMeeting,
+  updateMeeting,
+  deleteMeeting,
 };
