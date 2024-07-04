@@ -1,7 +1,6 @@
 const sequelize = require('./db');
 const { User } = require('../models/user'); // Update the import statement for the User model
 const { Collaborate } = require('../models/collaborate');
-const { EarlyAccess } = require('../models/earlyaccess');
 const { Video } = require('../models/video');
 const { Advertisement } = require('../models/advertisement');
 const { Founder } = require('../models/founder');
@@ -11,7 +10,6 @@ const { News } = require('../models/news');
 const { Partner } = require('../models/partner');
 const { Blog } = require('../models/blog');
 const { Newsletter } = require('../models/newsletter');
-const { Generalinfo } = require('../models/generalinfo');
 const { Social } = require('../models/social');
 const { BlogInteraction } = require('../models/blogInteraction');
 const { Comment } = require('../models/comment');
@@ -23,7 +21,6 @@ const { FeatureAd } = require('../models/featureAd');
 const { College } = require('../models/college');
 const { ServiceFAQ } = require('../models/serviceFAQ');
 const { Scholarship } = require('../models/scholarship');
-const { Loan } = require('../models/loan');
 const { Coaching } = require('../models/coaching');
 const { OTP } = require('../models/otp');
 const { Conversation } = require('../models/conversation');
@@ -38,7 +35,6 @@ const { Meeting } = require('../models/meeting');
 
         await User.sync(); // This will create the User table if it doesn't exist
         await Collaborate.sync();
-        await EarlyAccess.sync();
         await Video.sync();
         await Advertisement.sync(); // This will create the Advertisement table if it doesn't exist
         await Founder.sync();
@@ -48,7 +44,6 @@ const { Meeting } = require('../models/meeting');
         await Partner.sync();
         await Blog.sync();
         await Newsletter.sync();
-        await Generalinfo.sync();
         await Social.sync();
         await BlogInteraction.sync();
         await Comment.sync();
@@ -60,7 +55,6 @@ const { Meeting } = require('../models/meeting');
         await College.sync();
         await ServiceFAQ.sync();
         await Scholarship.sync();
-        await Loan.sync();
         await Coaching.sync();
         await OTP.sync();
         await Conversation.sync();
