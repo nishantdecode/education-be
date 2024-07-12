@@ -14,18 +14,17 @@ const VerificationRequest = sequelize.define("VerificationRequest", {
     allowNull: false,
     defaultValue: "pending",
   },
-  UserId: {
-    type: DataTypes.STRING, // Adjust based on your User model's primary key type
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
     references: {
       model: User,
-      key: "id", // Assuming 'id' is the primary key of the User model
+      key: "userId",
     },
   },
 });
 
-// Associations
-VerificationRequest.belongsTo(User, { foreignKey: "UserId" });
+VerificationRequest.belongsTo(User, { foreignKey: "userId" });
 
 module.exports = {
   VerificationRequest,

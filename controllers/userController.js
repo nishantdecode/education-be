@@ -23,28 +23,24 @@ const generateUserId = (stateAcronym, age, sequenceNo, nameInitials) => {
     .toString()
     .padStart(4, "0")}${nameInitials}`;
 };
+
 const sendOtp = async (req, res) => {
   try {
-    const { email, mobile } = req.body;
-    console.log(email, mobile);
+    const { email, mobile, verify } = req.body;
 
-    // Check if the email exists in the database
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-      console.log("Email not found");
-      return res
-        .status(404)
-        .json({ message: "Email not found", emailExists: false });
+    if (verify) {
+      const userEmail = await User.findOne({ where: { email } });
+      const userMobile = await User.findOne({ where: { mobile } });
+      if (userEmail || userMobile) {
+        return res.status(404).json({ message: "User already exists!" });
+      }
     }
 
-    // Hardcoded OTP for testing
     const otp = "123456";
+    // const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save OTP to the database
     await createOTP({ value: otp, email, mobile });
 
-    // Send OTP via email
     await sendMail(
       email,
       "OTP Verification",
@@ -60,48 +56,9 @@ const sendOtp = async (req, res) => {
   }
 };
 
-const sendOtptest = async (req, res) => {
-  try {
-    const { email, mobile } = req.body;
-    console.log(email, mobile);
-
-    // Check if the email and mobile exist in the database
-    const existingUser = await User.findOne({ where: { email, mobile } });
-
-    if (existingUser) {
-      console.log("User with email and mobile already exists");
-      return res.status(400).json({
-        message: "User with email and mobile already exists",
-        emailExists: true,
-      });
-    }
-
-    // Hardcoded OTP for testing
-    const otp = "123456";
-
-    // Save OTP to the database
-    await createOTP({ value: otp, email, mobile });
-
-    // Send OTP via email
-    await sendMail(
-      email,
-      "OTP Verification",
-      `Your OTP for verification is: ${otp}`
-    );
-
-    return res
-      .status(200)
-      .json({ message: "OTP sent successfully", emailExists: false });
-  } catch (error) {
-    console.error(`Error in sendOtp for email ${req.body.email}:`, error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 const verifyOtp = async (req, res) => {
   const { email, mobile, otp } = req.body;
 
-  console.log(email, otp);
   let otpFound;
   if (email) {
     otpFound = await OTP.findAll({ where: { email } });
@@ -109,20 +66,14 @@ const verifyOtp = async (req, res) => {
     otpFound = await OTP.findAll({ where: { mobile } });
   }
 
-  console.log(otpFound);
-  // Assuming OTP verification logic here, replace with actual verification logic
   let isOtpValid = false;
 
   if (otpFound.length > 0) {
-    // Check if any OTP matches the provided OTP
-    isOtpValid = otpFound.some((entry) => entry.value === otp); // Static OTP for demo purposes
+    isOtpValid = otpFound.some((entry) => entry.value === otp);
   }
 
-  console.log(isOtpValid);
   if (isOtpValid) {
-    // Save email and mobile to the database
     req.userData = { email, mobile };
-    // Assuming you want to delete all found OTPs
     await OTP.destroy({ where: { id: otpFound.map((entry) => entry.id) } });
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
@@ -278,11 +229,13 @@ const loginWithEmailAndOtp = async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
+    // console.log(user)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const isOtpValid = await verifyEmailOtp(email, otp);
+    // console.log(isOtpValid)
     if (!isOtpValid) {
       return res.status(401).json({ message: "Invalid OTP" });
     }
@@ -600,10 +553,9 @@ const getUserTagsAndBlogs = async (req, res) => {
 };
 
 module.exports = {
-  sendOtp,
-  sendOtptest,
-  verifyOtp,
   signup,
+  sendOtp,
+  verifyOtp,
   loginWithMobileAndOtp,
   loginWithEmailAndOtp,
   updateUserDetails,

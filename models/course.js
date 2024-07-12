@@ -58,6 +58,9 @@ const Course = sequelize.define('Course', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    imageUrl: {
+        type: DataTypes.STRING,
+    },
 }, {
     tableName: 'Courses',
 });

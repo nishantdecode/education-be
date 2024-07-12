@@ -1,6 +1,13 @@
 const crypto = require("crypto");
 const { instance } = require("../config/razorpay.js");
 const { Order } = require("../models/order");
+const { Slot } = require("../models/slot.js");
+const { Meeting } = require("../models/meeting.js");
+const { User } = require("../models/user.js");
+const { createZoomMeeting } = require("../api/zoomAPI.js");
+
+const BASE_URL =
+  process.env.ENV === "PROD" ? process.env.CLIENT_PROD : process.env.CLIENT_DEV;
 
 const getAllUserOrders = async (req, res) => {
   const { userId } = req.params;
@@ -8,6 +15,7 @@ const getAllUserOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
       where: { userId },
+      include: [{ model: User }, { model: Slot }, { model: Meeting }],
     });
 
     if (!orders.length) {
@@ -24,8 +32,9 @@ const getOrder = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const order = await Order.findByPk(orderId);
-
+    const order = await Order.findByPk(orderId, {
+      include: [{ model: User }, { model: Slot }, { model: Meeting }],
+    });
 
     if (!order) {
       return res.status(404).json({ message: "No order found" });
@@ -44,20 +53,29 @@ const checkout = async (req, res) => {
   };
   const order = await instance.orders.create(options);
 
-  await Order.create({
-    topic: req.body.topic,
-    razorpay_order_id: order.id,
-    userId: req.body.userId,
-    slotId: req.body.slotId,
-    amount: req.body.amount,
-    currency: "INR",
-    status: "Pending",
-  });
+  const slotFetched = await Slot.findByPk(req.body.slotId);
 
-  res.status(200).json({
-    success: true,
-    order,
-  });
+  if (slotFetched.status === "Available") {
+    await Order.create({
+      topic: req.body.topic,
+      razorpay_order_id: order.id,
+      userId: req.body.userId,
+      slotId: req.body.slotId,
+      amount: req.body.amount,
+      currency: "INR",
+      status: "Pending",
+    });
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } else {
+    res.status(200).json({
+      success: false,
+      order: null,
+    });
+  }
 };
 
 const paymentVerification = async (req, res) => {
@@ -76,7 +94,11 @@ const paymentVerification = async (req, res) => {
   if (isAuthentic) {
     const order = await Order.findOne({
       where: { razorpay_order_id },
+      include: [{ model: User }, { model: Slot }],
     });
+
+    const user = order.User;
+    const slot = order.Slot;
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
@@ -88,9 +110,44 @@ const paymentVerification = async (req, res) => {
 
     await order.save();
 
-    res.redirect(
-      `http://localhost:3000/chatting/paymentStatus?status=successful&orderId=${order.id}`
+    const zoomMeeting = await createZoomMeeting(
+      2,
+      user.email,
+      slot.startTime,
+      order.topic
     );
+
+    if (slot.status === "Available" && zoomMeeting) {
+      const slot = await Slot.findOne({
+        where: { id: order.slotId },
+      });
+
+      slot.status = "Booked";
+      slot.bookingUserId = user.userId;
+
+      await slot.save();
+
+      const meeting = await Meeting.create({
+        topic: order.topic,
+        userId: order.userId,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        hostLink: zoomMeeting.start_url,
+        attendeeLink: zoomMeeting.join_url,
+        status: "Join",
+      });
+
+      order.meetingId = meeting.id;
+      order.save();
+
+      res.redirect(
+        `${BASE_URL}chatting/paymentStatus?status=successful&orderId=${order.id}`
+      );
+    } else {
+      res.redirect(
+        `${BASE_URL}chatting/paymentStatus?status=failed&orderId=null`
+      );
+    }
   } else {
     const { error } = req.body;
     const metadata = JSON.parse(error["error[metadata]"]);
@@ -102,34 +159,14 @@ const paymentVerification = async (req, res) => {
     order.status = "Failed";
     await order.save();
     res.redirect(
-      `http://localhost:3000/chatting/paymentStatus?status=failed&orderId=null`
+      `${BASE_URL}chatting/paymentStatus?status=failed&orderId=null`
     );
-  }
-};
-
-const invoice = async (req, res) => {
-  const { orderId } = req.params;
-  try {
-    const order = await Order.findByPk(orderId);
-    if (!order) {
-      return res.status(404).send("Order not found");
-    }
-
-    const doc = generateInvoice(order);
-    const pdfData = doc.output("blob");
-
-    res.setHeader("Content-disposition", "attachment; filename=invoice.pdf");
-    res.setHeader("Content-type", "application/pdf");
-    res.send(pdfData);
-  } catch (error) {
-    res.status(500).send("Server error");
   }
 };
 
 module.exports = {
   getOrder,
   getAllUserOrders,
-  invoice,
   checkout,
   paymentVerification,
 };

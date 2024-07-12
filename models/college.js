@@ -46,6 +46,9 @@ const College = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+    },
     url: {
       type: DataTypes.STRING,
       allowNull: false,

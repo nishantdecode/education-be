@@ -59,8 +59,8 @@ const { Meeting } = require('../models/meeting');
         await OTP.sync();
         await Conversation.sync();
         await Slot.sync();
-        await Order.sync();
         await Meeting.sync();
+        await Order.sync();
 
         console.log('Tables created successfully');
     } catch (error) {

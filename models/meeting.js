@@ -1,14 +1,11 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const {User} = require("./user")
+const { User } = require("./user");
 
 const Meeting = sequelize.define(
   "Meeting",
   {
     topic: {
-      type: DataTypes.STRING,
-    },
-    slotId: {
       type: DataTypes.STRING,
     },
     userId: {
@@ -36,7 +33,8 @@ const Meeting = sequelize.define(
   }
 );
 
-Meeting.belongsTo(User, { foreignKey: 'userId', targetKey: 'userId' });
+// Associations
+Meeting.belongsTo(User, { foreignKey: "userId", targetKey: "userId" });
 
 module.exports = {
   Meeting,

@@ -1,6 +1,9 @@
-// models/serviceFAQAd.js
+// models/order.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
+const { Meeting } = require("./meeting");
+const { Slot } = require("./slot");
+const { User } = require("./user");
 
 const Order = sequelize.define(
   "Order",
@@ -13,8 +16,11 @@ const Order = sequelize.define(
       allowNull: false,
     },
     slotId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    meetingId: {
+      type: DataTypes.INTEGER,
     },
     amount: {
       type: DataTypes.INTEGER,
@@ -43,6 +49,11 @@ const Order = sequelize.define(
     tableName: "Order",
   }
 );
+
+// Associations
+Order.belongsTo(Meeting, { foreignKey: "meetingId", targetKey: "id" });
+Order.belongsTo(Slot, { foreignKey: "slotId", targetKey: "id" });
+Order.belongsTo(User, { foreignKey: "userId", targetKey: "userId" });
 
 module.exports = {
   Order,

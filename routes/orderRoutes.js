@@ -8,7 +8,6 @@ router.get("/getkey", (req, res) => {
 router.get("/getOrder/:orderId", orderController.getOrder);
 router.post("/checkout", orderController.checkout);
 router.post("/paymentverification", orderController.paymentVerification);
-router.get("/invoice/:orderId", orderController.invoice);
 router.get("/:userId", orderController.getAllUserOrders);
 
 module.exports = router;

@@ -1,73 +1,7 @@
-const { createZoomMeeting, listZoomMeetings } = require("../api/zoomAPI.js");
+const { listZoomMeetings } = require("../api/zoomAPI.js");
 const { Meeting } = require("../models/meeting");
-const { Slot } = require("../models/slot.js");
 const { User } = require("../models/user");
 const { Op } = require("sequelize");
-
-const createAppointment = async (req, res) => {
-  const { type, userId, email, startTime, endTime, topic, slotId } = req.body;
-
-  try {
-    if (
-      !type ||
-      !userId ||
-      !email ||
-      !startTime ||
-      !endTime ||
-      !topic ||
-      !slotId
-    ) {
-      res.status(400).json({ message: "Please fill all the fields" });
-      return;
-    }
-
-    const slotFetched = await Slot.findByPk(slotId);
-
-    if (slotFetched.status === "Available") {
-      const zoomMeeting = await createZoomMeeting(
-        type,
-        email,
-        startTime,
-        topic
-      );
-
-      if (zoomMeeting) {
-        await Meeting.create({
-          topic,
-          slotId,
-          userId,
-          startTime,
-          endTime,
-          hostLink: zoomMeeting.start_url,
-          attendeeLink: zoomMeeting.join_url,
-          status: "Join",
-        });
-
-        const slot = await Slot.findOne({
-          where: { id: order.slotId },
-        });
-
-        slot.status = "Booked";
-        slot.bookingUserId = order.userId;
-
-        await slot.save();
-
-        res.status(201).json(zoomMeeting);
-        return;
-      } else {
-        throw new Error("Zoom meeting creation failed");
-      }
-    } else {
-      res.status(400).json({ message: "Slot already booked" });
-      return;
-    }
-  } catch (error) {
-    console.error("Error creating meeting:", error);
-    res
-      .status(500)
-      .json({ message: "Error creating meeting", error: error.message });
-  }
-};
 
 const listMeeting = async (req, res) => {
   try {
@@ -221,7 +155,6 @@ const deleteMeeting = async (req, res) => {
 };
 
 module.exports = {
-  createAppointment,
   listMeeting,
   getMeeting,
   latestMeeting,
