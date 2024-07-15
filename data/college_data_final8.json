@@ -1,2 +1,42 @@
-[{"url":"https://www.shiksha.com/college/sivet-college-tamil-nadu-other-29854","clgname":"SIVET College","location":"Tamil Nadu - Other","rating":"4.5 /5\n(8 Reviews)","admission":[],"course_info":[],"specialization":["Chemistry"],"placements":[],"features_rating":["Placements 4.2","Infrastructure 4.6","Faculty & Course Curriculum 4.4","Crowd & Campus Life 4.6","Value for Money 4.6"],"review_count":"(8 Reviews)","infrastructure":["Labs","Library"],"other_facilities":[]},
-{"url":"https://www.shiksha.com/college/pioneer-institute-of-hotel-management-ramnagar-hyderabad-40774","clgname":"Pioneer Institute of Hotel Management","location":"Ramnagar, Hyderabad","rating":"4.4 /5\n(5 Reviews)","admission":[],"course_info":[],"specialization":[],"placements":[],"features_rating":["Placements 4.8","Infrastructure 4.4","Faculty & Course Curriculum 4.4","Crowd & Campus Life 4.2","Value for Money 4.0"],"review_count":"(5 Reviews)","infrastructure":[],"other_facilities":[]}]
+[
+  {
+    "url": "https://www.shiksha.com/college/sivet-college-tamil-nadu-other-29854",
+    "clgname": "SIVET College",
+    "location": "Tamil Nadu - Other",
+    "rating": "4.5 /5\n(8 Reviews)",
+    "admission": [],
+    "course_info": [],
+    "specialization": ["Chemistry"],
+    "placements": [],
+    "features_rating": [
+      "Placements 4.2",
+      "Infrastructure 4.6",
+      "Faculty & Course Curriculum 4.4",
+      "Crowd & Campus Life 4.6",
+      "Value for Money 4.6"
+    ],
+    "review_count": "(8 Reviews)",
+    "infrastructure": ["Labs", "Library"],
+    "other_facilities": []
+  },
+  {
+    "url": "https://www.shiksha.com/college/pioneer-institute-of-hotel-management-ramnagar-hyderabad-40774",
+    "clgname": "Pioneer Institute of Hotel Management",
+    "location": "Ramnagar, Hyderabad",
+    "rating": "4.4 /5\n(5 Reviews)",
+    "admission": [],
+    "course_info": [],
+    "specialization": [],
+    "placements": [],
+    "features_rating": [
+      "Placements 4.8",
+      "Infrastructure 4.4",
+      "Faculty & Course Curriculum 4.4",
+      "Crowd & Campus Life 4.2",
+      "Value for Money 4.0"
+    ],
+    "review_count": "(5 Reviews)",
+    "infrastructure": [],
+    "other_facilities": []
+  }
+]

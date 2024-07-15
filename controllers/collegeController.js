@@ -9,6 +9,8 @@ const data7 = require("../data/college_data_final7.json");
 const data8 = require("../data/college_data_final8.json");
 const data9 = require("../data/college_data_final9.json");
 const { Op } = require("sequelize");
+const sequelize = require("../config/db");
+const { Sequelize } = require("sequelize");
 
 const create = async (req, res) => {
   try {
@@ -22,7 +24,6 @@ const create = async (req, res) => {
 };
 const importCollegeData = async (req, res) => {
   try {
-    // const college = await createCollege(req.body);
     const colleges = [
       ...data1,
       ...data2,
@@ -34,7 +35,6 @@ const importCollegeData = async (req, res) => {
       ...data8,
       ...data9,
     ];
-    // const result = [];
     for (let college of colleges) {
       let rating = college.rating;
       let review = college.review_count;
@@ -44,8 +44,6 @@ const importCollegeData = async (req, res) => {
       if (review) {
         review = parseInt(review.split(" ")[0].trim().substr(1));
       }
-      console.log({ course: college.course_info });
-      // result.push();
       await createCollege({
         name: college.clgname,
         course_data: college.course_info,
@@ -96,12 +94,11 @@ const getAllColleges = async (req, res) => {
     }
 
     if (courses && courses.length > 0) {
-      const courseFilters = courses.map((md) => ({
-        course: {
-          [Op.iLike]: `%${md}%`,
+      filters.where[Op.and].push({
+        specialization: {
+          [Op.overlap]: courses,
         },
-      }));
-      filters.where[Op.and].push({ [Op.or]: courseFilters });
+      });
     }
 
     if (locations && locations.length > 0) {
@@ -132,7 +129,7 @@ const getAllColleges = async (req, res) => {
     if (ratings && ratings.length > 0) {
       const ratingFilters = ratings.map((r) => {
         const rating = parseFloat(r);
-        console.log(rating)
+        console.log(rating);
         return {
           rating: {
             [Op.gte]: parseFloat(rating),
@@ -180,33 +177,43 @@ const getAllColleges = async (req, res) => {
 
 const getFilterData = async (req, res) => {
   try {
+    // Get distinct locations
     const filterData = await College.aggregate("location", "DISTINCT", {
       plain: false,
     });
     const locations = filterData.map((item) => item.DISTINCT);
 
-    const courses = await College.aggregate("course", "DISTINCT", {
-      plain: false,
-    });
-    const coursesList = courses.map((item) => item.DISTINCT);
+    // Get distinct specializations
+    const result = await sequelize.query(
+      `
+      SELECT DISTINCT UNNEST(specialization) AS specialization
+      FROM "Colleges"
+      `,
+      {
+        type: Sequelize.QueryTypes.SELECT,
+      }
+    );
+    const courses = [...new Set(result.map((row) => row.specialization))];
 
+    // Get min and max fees
     const minPrice = await College.min("fees");
     const maxPrice = await College.max("fees");
 
     // Construct the response object
     const filterObject = {
       locations,
-      courses: coursesList,
+      courses,
       minPrice,
       maxPrice,
     };
+
     res
       .status(200)
       .json({ message: "Filter data retrieved successfully", filterObject });
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error retrieving course", error: error.message });
+      .json({ message: "Error retrieving filter data", error: error.message });
   }
 };
 

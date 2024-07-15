@@ -7,27 +7,27 @@ const Course = sequelize.define('Course', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    platform: {
-        type: DataTypes.STRING,
+    url: {
+        type: DataTypes.STRING(2048),
         allowNull: false,
     },
-    organization: {
-        type: DataTypes.STRING,
+    price: {
+        type: DataTypes.FLOAT,
         allowNull: true,
-    },
-    duration: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    mode: {
-        type: DataTypes.STRING,
-        allowNull: false,
     },
     language: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    reviews: {
+    level: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    platform: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    numberOfEnrollments: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -37,26 +37,26 @@ const Course = sequelize.define('Course', {
         allowNull: false,
         defaultValue: 0,
     },
-    price: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
+    mode: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    numberOfEnrollments: {
+    reviews: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
     },
-    instructor: {
+    duration: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    organisation: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    level: {
+    instructor: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
-    url: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     imageUrl: {
         type: DataTypes.STRING,

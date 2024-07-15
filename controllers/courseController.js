@@ -2,6 +2,7 @@ const { Course, createCourse } = require("../models/course");
 const excelToJson = require("convert-excel-to-json");
 const fs = require("fs");
 const { Op } = require("sequelize"); // Import Sequelize's Op
+const csv = require("csv-parser");
 
 const create = async (req, res) => {
   try {
@@ -17,202 +18,267 @@ const create = async (req, res) => {
 //
 const importCourseData = async (req, res) => {
   try {
-    // const course = await createCourse(req.body);
-    // const excel = req.file;
-    const excel = req.files.file;
-    const file = fs.readFileSync(excel.tempFilePath);
+    const csvFile = req.file;
     const { platform } = req.query;
-    const result = excelToJson({
-      source: file, // fs.readFileSync return a Buffer
-    });
-    //   console.log({result})
-    // const promises = [];
-    if (platform === "Udemy") {
-      for (let row of result?.Sheet1) {
-        let title = row.A;
-        let url = row.B;
-        let price = row.C;
-        let language = row.D;
-        let level = row.E;
-        let enrollments = row.F;
-        let rating = row.G;
-        let reviews = row.H;
-        let lectures = row.I;
-        let category = row.J;
-        let subtitles = row.K;
-        let duration = row.L;
 
-        if (price === "FREE") {
-          price = 0;
-        } else if (price) {
-          price = parseFloat(price.slice(1, price.length));
-        }
-        if (enrollments) {
-          enrollments = parseInt(enrollments);
-        }
-        if (rating) {
-          rating = parseFloat(rating);
-        }
-        if (reviews) {
-          reviews = parseInt(reviews);
-        }
-        await createCourse({
-          title,
-          platform,
-          duration,
-          mode: "ONLINE",
-          language,
-          reviews,
-          averageRating: rating,
-          price,
-          numberOfEnrollments: enrollments,
-          level,
-          url,
-        });
-      }
-    }
-    if (platform === "Coursea") {
-      for (let row of result?.Sheet1) {
-        let url = row.A;
-        let title = row.B;
-        let organization = row.C;
-        let rating = row.D;
-        let enrollments = row.F;
-        let level = row.H;
-        let duration = row.I;
-        let language = row.J;
-        let price = row.L;
-        // let reviews = row.H;
-        // let lectures = row.I;
-        // let category = row.J;
-        // let subtitles = row.K;
+    const results = [];
 
-        if (price === "FREE") {
-          price = 0;
-        } else if (price) {
-          price = parseFloat(price);
-        }
-        if (enrollments) {
-          enrollments = parseInt(enrollments);
-        }
-        if (rating) {
-          if (rating === "NA") {
-            rating = 0;
-          } else {
-            rating = parseFloat(rating);
+    fs.createReadStream(csvFile.path)
+      .pipe(csv())
+      .on("data", (row) => {
+        results.push(row);
+      })
+      .on("end", async () => {
+        if (platform === "Udemy") {
+          for (let row of results) {
+            let {
+              title,
+              url,
+              price,
+              Language,
+              Level,
+              enrollments,
+              rating,
+              "Number of Reviews": reviews,
+              "Number of Lectures": lectures,
+              category,
+              subtitles,
+              Time,
+            } = row;
+
+            if (typeof price === "string") {
+              price = price.trim();
+              if (price.toUpperCase() === "FREE") {
+                price = 0;
+              } else {
+                price = parseFloat(price.replace(/[^0-9.]/g, ""));
+              }
+            }
+            if (enrollments) {
+              enrollments = parseInt(enrollments);
+            }
+            if (rating) {
+              rating = parseFloat(rating);
+            }
+            if (reviews) {
+              reviews = parseInt(reviews);
+            }
+
+            // console.log({
+            //   title,
+            //   url,
+            //   price,
+            //   language: Language,
+            //   level: Level,
+            //   platform,
+            //   numberOfEnrollments: enrollments,
+            //   averageRating: rating,
+            //   mode: "ONLINE",
+            //   reviews,
+            //   duration: Time,
+            //   imageUrl: "/images/udemy1.png",
+            // });
+
+            await createCourse({
+              title,
+              url,
+              price,
+              language: Language,
+              level: Level,
+              platform,
+              numberOfEnrollments: enrollments,
+              averageRating: rating,
+              mode: "ONLINE",
+              reviews,
+              duration: Time,
+              imageUrl: "/images/udemy1.png",
+            });
           }
         }
 
-        await createCourse({
-          title,
-          platform,
-          duration,
-          mode: "ONLINE",
-          language,
-          averageRating: rating,
-          price,
-          numberOfEnrollments: enrollments,
-          level,
-          url,
-          organization,
-        });
-      }
-    }
-    if (platform === "Skillshare") {
-      for (let row of result?.Sheet1) {
-        let url = row.A;
-        let title = row.B;
-        let enrollments = row.D;
-        let level = row.E;
-        let duration = row.F;
-        let instructor = row.G;
-        let rating = row.I;
-        // let organization = row.C
-        // let language = row.J;
-        // let price = row.L;
-        // let reviews = row.H;
-        // let lectures = row.I;
-        // let category = row.J;
-        // let subtitles = row.K;
+        if (platform === "Coursera") {
+          for (let row of results) {
+            let {
+              title,
+              url,
+              price,
+              Language,
+              Level,
+              enrollments,
+              rating,
+              "Rating Count": reviews,
+              Mode,
+              category,
+              subtitles,
+              duration,
+              organisation,
+              "Course Package": package,
+              "Course Projects": project,
+            } = row;
 
-        // if(price === "FREE"){
-        //     price = 0
-        // }else if(price) {
-        //     price = parseFloat(price.slice(1,price.length));
-        // }
-        if (enrollments) {
-          enrollments = parseInt(enrollments);
-        }
-        if (rating) {
-          rating = parseFloat(rating);
-        }
+            if (price === "FREE") {
+              price = 0;
+            } else if (price) {
+              price = parseFloat(price);
+            }
+            if (enrollments) {
+              enrollments = parseInt(enrollments);
+            }
+            if (rating) {
+              if (rating === "NA") {
+                rating = 0;
+              } else {
+                rating = parseFloat(rating);
+              }
+            }
+            if (reviews) {
+              if (reviews === "NA") {
+                reviews = 0;
+              } else {
+                reviews = parseFloat(reviews);
+              }
+            }
 
-        await createCourse({
-          title,
-          platform,
-          duration,
-          mode: "ONLINE",
-          // language,
-          averageRating: rating,
-          // price,
-          instructor,
-          numberOfEnrollments: enrollments,
-          level,
-          url,
-          // organization:platform
-        });
-      }
-    }
-    if (platform === "Edx") {
-      for (let row of result?.Sheet1) {
-        let enrollments = row.A;
-        let title = row.B;
-        let organization = row.C;
-        let language = row.D;
-        let level = row.E;
-        let price = row.G;
-        let duration = row.I;
-        let url = row.J;
-        // let rating = row.D;
-        // let reviews = row.H;
-        // let lectures = row.I;
-        // let category = row.J;
-        // let subtitles = row.K;
+            // console.log({
+            //   title,
+            //   url,
+            //   price,
+            //   language: Language,
+            //   level: Level,
+            //   platform,
+            //   numberOfEnrollments: enrollments,
+            //   averageRating: rating,
+            //   mode: "ONLINE",
+            //   reviews,
+            //   duration, //double int could be extracted
+            //   organisation,
+            //   imageUrl: "/images/coursera.png",
+            // });
 
-        if (price === "FREE") {
-          price = 0;
-        } else if (price) {
-          price = parseFloat(price);
-        }
-        if (enrollments) {
-          console.log({ enrollments });
-          if (enrollments === "-") {
-            enrollments = 0;
-          } else {
-            enrollments = parseInt(enrollments);
+            await createCourse({
+              title,
+              url,
+              price,
+              language: Language,
+              level: Level,
+              platform,
+              numberOfEnrollments: enrollments,
+              averageRating: rating,
+              mode: "ONLINE",
+              reviews,
+              duration, //double int could be extracted
+              organisation,
+              imageUrl: "/images/coursera.png",
+            });
           }
-          console.log({ enrollments });
         }
-        // if(rating){
-        //     rating = parseFloat(rating)
-        // }
+        if (platform === "Skillshare") {
+          for (let row of results) {
+            let {
+              title,
+              url,
+              Level,
+              enrollments,
+              rating,
+              duration,
+              instructor,
+              "Related Skills": skill,
+            } = row;
 
-        await createCourse({
-          title,
-          platform,
-          duration,
-          mode: "ONLINE",
-          language,
-          // averageRating:rating,
-          price,
-          numberOfEnrollments: enrollments,
-          level,
-          url,
-          organization,
-        });
-      }
-    }
-    // await Promise.all(promises);
+            if (enrollments) {
+              enrollments = parseInt(enrollments);
+            }
+            if (rating) {
+              rating = parseFloat(rating);
+            }
+
+            // console.log({
+            //   title,
+            //   url,
+            //   language: "English", //language info not provided
+            //   level: Level,
+            //   platform,
+            //   numberOfEnrollments: enrollments,
+            //   averageRating: rating,
+            //   mode: "ONLINE",
+            //   duration,
+            //   organisation: platform,
+            //   instructor,
+            //   imageUrl: "/images/skillshare.png",
+            // });
+
+            await createCourse({
+              title,
+              url,
+              language: "English", //language info not provided
+              level: Level,
+              platform,
+              numberOfEnrollments: enrollments,
+              averageRating: rating,
+              mode: "ONLINE",
+              duration,
+              organisation: platform,
+              instructor,
+              imageUrl: "/images/skillshare.png",
+            });
+          }
+        }
+        if (platform === "Edx") {
+          for (let row of results) {
+            let {
+              h1,
+              url,
+              price,
+              language,
+              level,
+              enrollments,
+              time_duration,
+              institution,
+            } = row;
+
+            if (price === "FREE") {
+              price = 0;
+            } else if (price) {
+              price = parseFloat(price);
+            }
+            if (enrollments) {
+              if (enrollments === "-") {
+                enrollments = 0;
+              } else {
+                enrollments = parseInt(enrollments);
+              }
+            }
+
+            // console.log({
+            //   title: h1,
+            //   url,
+            //   price,
+            //   language,
+            //   level,
+            //   platform,
+            //   numberOfEnrollments: enrollments,
+            //   mode: "ONLINE",
+            //   duration: time_duration,
+            //   organisation: institution,
+            //   imageUrl: "/images/edx.png"
+            // })
+
+            await createCourse({
+              title: h1,
+              url,
+              price,
+              language,
+              level,
+              platform,
+              numberOfEnrollments: enrollments,
+              mode: "ONLINE",
+              duration: time_duration,
+              organisation: institution,
+              imageUrl: "/images/edx.png",
+            });
+          }
+        }
+      });
 
     res.status(201).json({ message: "Course created successfully" });
   } catch (error) {
@@ -222,17 +288,18 @@ const importCourseData = async (req, res) => {
   }
 };
 
-//
 const getAllCourses = async (req, res) => {
   try {
     let { page, show, search } = req.query;
     let { languages, minFees, maxFees, modes, platforms } = req.body;
+
     const filters = {
       where: {
         [Op.and]: [],
       },
     };
 
+    console.log(req.body);
     if (search) {
       filters.where.title = {
         [Op.iLike]: `%${search}%`,
@@ -266,18 +333,35 @@ const getAllCourses = async (req, res) => {
       });
     }
 
-    if (minFees) {
-      filters.where.price = {
-        [Op.gte]: minFees,
-      };
-    }
-    if (maxFees) {
-      if (filters.where.price) {
-        filters.where.price[Op.lte] = maxFees;
-      } else {
-        filters.where.price = {
-          [Op.lte]: maxFees,
+    if (platforms && platforms.includes("Skillshare")) {
+      if (minFees || maxFees) {
+        const feeFilters = {
+          [Op.or]: [
+            { platform: { [Op.iLike]: "Skillshare" } },
+            {
+              price: {
+                ...(minFees && { [Op.gte]: minFees }),
+                ...(maxFees && { [Op.lte]: maxFees }),
+              },
+            },
+          ],
         };
+        filters.where[Op.and].push(feeFilters);
+      }
+    } else {
+      if (minFees) {
+        filters.where.price = {
+          [Op.gte]: minFees,
+        };
+      }
+      if (maxFees) {
+        if (filters.where.price) {
+          filters.where.price[Op.lte] = maxFees;
+        } else {
+          filters.where.price = {
+            [Op.lte]: maxFees,
+          };
+        }
       }
     }
     if (page) {
@@ -329,6 +413,7 @@ const getFilterData = async (req, res) => {
 
     const minPrice = await Course.min("price");
     const maxPrice = await Course.max("price");
+    console.log(maxPrice);
 
     // Construct the response object
     const filterObject = {
