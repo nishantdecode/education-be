@@ -30,7 +30,7 @@ const sendOtp = async (req, res) => {
 
     if (verify) {
       const userEmail = await User.findOne({ where: { email } });
-      const userMobile = await User.findOne({ where: { mobile } });
+      const userMobile = await User.findOne({ where: { mobile: mobile.trim().split(" ")[1] } });
       if (userEmail || userMobile) {
         return res.status(404).json({ message: "User already exists!" });
       }
@@ -161,21 +161,6 @@ const verifyMobileOtp = async (mobile, otp) => {
   return isOtpValid;
 };
 
-const verifyEmailOtp = async (email, otp) => {
-  let otpFound = await OTP.findAll({ where: { email } });
-
-  let isOtpValid = false;
-
-  if (otpFound.length > 0) {
-    isOtpValid = otpFound.some((entry) => entry.value === otp);
-  }
-
-  if (isOtpValid) {
-    await OTP.destroy({ where: { id: otpFound.map((entry) => entry.id) } });
-  }
-  return isOtpValid;
-};
-
 const findUserByMobile = async (mobile) => {
   try {
     // Assuming the User model has a method to find a user by mobile number
@@ -190,7 +175,7 @@ const loginWithMobileAndOtp = async (req, res) => {
   const { mobile, otp } = req.body;
 
   try {
-    const user = await findUserByMobile(mobile);
+    const user = await findUserByMobile(mobile.trim().split(" ")[1]);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -211,6 +196,21 @@ const loginWithMobileAndOtp = async (req, res) => {
       .status(500)
       .json({ message: "Error during login", error: error.message });
   }
+};
+
+const verifyEmailOtp = async (email, otp) => {
+  let otpFound = await OTP.findAll({ where: { email } });
+
+  let isOtpValid = false;
+
+  if (otpFound.length > 0) {
+    isOtpValid = otpFound.some((entry) => entry.value === otp);
+  }
+
+  if (isOtpValid) {
+    await OTP.destroy({ where: { id: otpFound.map((entry) => entry.id) } });
+  }
+  return isOtpValid;
 };
 
 const findUserByEmail = async (email) => {
