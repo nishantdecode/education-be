@@ -1,3 +1,155 @@
+# SQL Integration in Node/Express Backend for Educational Sites
+
+## Overview
+I implemented SQL in the backend of my educational sites using **Sequelize** as the ORM and **PostgreSQL** as the database. I structured the backend using **models** for different entities, ensuring efficient data management and relationships.
+
+## Technologies Used
+- **Node.js**
+- **Express.js**
+- **Sequelize ORM**
+- **PostgreSQL**
+
+## Database Configuration
+I set up the Sequelize instance in `config/db.js`:
+
+```javascript
+const { Sequelize } = require("sequelize");
+const sequelize = new Sequelize(process.env.DB_URI, {
+  dialect: "postgres",
+  logging: false,
+});
+
+module.exports = sequelize;
+```
+
+## Model Structure
+Each model represents a different entity in the system. Below is an example of the **Blog** model:
+
+```javascript
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+const { User } = require("./user");
+
+const Blog = sequelize.define(
+  "Blog",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    userId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    tags: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+  },
+  {
+    tableName: "Blogs",
+  }
+);
+
+Blog.belongsTo(User, { foreignKey: "userId" });
+
+const createBlog = async (addData) => {
+  try {
+    return await Blog.create(addData);
+  } catch (error) {
+    console.error("Validation error details:", error);
+    throw new Error(error.message);
+  }
+};
+
+module.exports = { Blog, createBlog };
+```
+
+## Other Models
+I structured my backend with multiple models to handle different functionalities:
+
+- `advertisement.js`
+- `blog.js`
+- `blogInteraction.js`
+- `coaching.js`
+- `collaborate.js`
+- `college.js`
+- `comment.js`
+- `commentInteraction.js`
+- `commentReport.js`
+- `conversation.js`
+- `course.js`
+- `featureAd.js`
+- `founder.js`
+- `loan.js`
+- `meeting.js`
+- `news.js`
+- `newsletter.js`
+- `offer.js`
+- `order.js`
+- `otp.js`
+- `partner.js`
+- `scholarship.js`
+- `serviceFAQ.js`
+- `slot.js`
+- `social.js`
+- `testimonial.js`
+- `user.js`
+- `verificationTag.js`
+- `video.js`
+
+## Database Synchronization
+To ensure the models are properly migrated into the database, I used:
+
+```javascript
+const sequelize = require("./config/db");
+const models = require("./models");
+
+(async () => {
+  try {
+    await sequelize.sync({ alter: true });
+    console.log("Database synchronized successfully");
+  } catch (error) {
+    console.error("Error syncing database:", error);
+  }
+})();
+```
+
+## Running the Project
+1. Install dependencies:
+   ```sh
+   npm install
+   ```
+2. Set up environment variables (`.env` file):
+   ```env
+   DB_URI=your_database_url_here
+   ```
+3. Start the server:
+   ```sh
+   node server.js
+   ```
+
+## Conclusion
+By structuring the backend with **Sequelize models**, I efficiently managed different entities, relationships, and database operations, ensuring scalability and maintainability.
+
+
+
+
+
 **Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
 
 When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
